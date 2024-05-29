@@ -1,0 +1,18 @@
+export default {
+    id: 'id',
+    nickname: 'nickname',
+    mobile: 'mobile',
+    gender: 'gender',
+    'gender 0': 'gender 0',
+    'gender 1': 'gender 1',
+    'gender 2': 'gender 2',
+    city: 'city',
+    remark: 'remark',
+    type_id: 'type_id',
+    type__name: 'name',
+    user_id: 'user_id',
+    user__username: 'username',
+    create_time: 'create_time',
+    update_time: 'update_time',
+    'quick Search Fields': 'nickname,mobile,id,user_id',
+}
