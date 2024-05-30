@@ -178,22 +178,22 @@ class Auth extends \ba\Auth
      */
     public function register(string $username, string $password, string $mobile = '', string $email = '', int $group = 1, array $extend = []): bool
     {
-        $validate = Validate::rule([
-            'mobile'   => 'mobile|unique:user',
-            'email'    => 'email|unique:user',
-            'username' => 'regex:^[a-zA-Z][a-zA-Z0-9_]{2,15}$|unique:user',
-            'password' => 'regex:^(?!.*[&<>"\'\n\r]).{6,32}$',
-        ]);
+//        $validate = Validate::rule([
+//            'mobile'   => 'mobile|unique:user',
+//            'email'    => 'email|unique:user',
+//            'username' => 'regex:^[a-zA-Z][a-zA-Z0-9_]{2,15}$|unique:user',
+//            'password' => 'regex:^(?!.*[&<>"\'\n\r]).{6,32}$',
+//        ]);
         $params   = [
             'username' => $username,
             'password' => $password,
             'mobile'   => $mobile,
             'email'    => $email,
         ];
-        if (!$validate->check($params)) {
-            $this->setError('Registration parameter error');
-            return false;
-        }
+//        if (!$validate->check($params)) {
+//            $this->setError('Registration parameter error');
+//            return false;
+//        }
 
         $ip   = request()->ip();
         $time = time();
