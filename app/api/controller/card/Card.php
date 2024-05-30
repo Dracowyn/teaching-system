@@ -217,6 +217,8 @@ class Card extends Frontend
 			} else {
 				$this->error(__('Edit failed'));
 			}
+		} else {
+			$this->error(__('Method not allowed'));
 		}
 	}
 
