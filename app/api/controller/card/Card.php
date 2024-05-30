@@ -7,6 +7,7 @@
 namespace app\api\controller\card;
 
 use app\common\controller\Frontend;
+use app\common\model\card\Type;
 use think\db\exception\DataNotFoundException;
 use think\db\exception\DbException;
 use think\db\exception\ModelNotFoundException;
@@ -39,6 +40,7 @@ class Card extends Frontend
 		if ($this->request->isPost()) {
 			$params    = $this->request->post(['search', 'type', 'page', 'limit']);
 			$cardModel = new \app\common\model\card\Card();
+			$typeModel = new Type();
 			$validate  = new \app\api\validate\card\Card();
 			$userInfo  = $this->auth->getUserInfo();
 
@@ -61,7 +63,7 @@ class Card extends Frontend
 					['id', '=', $params['type']],
 					['user_id', '=', $userInfo['id']]
 				];
-				$type  = $cardModel->where($where)->find();
+				$type  = $typeModel->where($where)->find();
 				if (!$type) {
 					$this->error(__('Type not exists'));
 				}
