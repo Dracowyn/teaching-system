@@ -144,4 +144,79 @@ class Card extends Frontend
 			$this->error(__('Method not allowed'));
 		}
 	}
+
+	/**
+	 * 编辑名片
+	 * @return void
+	 * @throws Throwable
+	 * @throws DataNotFoundException
+	 * @throws DbException
+	 * @throws ModelNotFoundException
+	 */
+	public function edit(): void
+	{
+		if ($this->request->isPost()) {
+			$params    = $this->request->post(['id', 'nickname', 'mobile', 'gender', 'city', 'remark', 'type']);
+			$cardModel = new \app\common\model\card\Card();
+			$typeModel = new Type();
+			$validate  = new \app\api\validate\card\Card();
+			$userInfo  = $this->auth->getUserInfo();
+
+			try {
+				$validate->scene('edit')->check($params);
+			} catch (Throwable $e) {
+				$this->error($e->getMessage());
+			}
+
+			$cardWhere = [
+				['id', '=', $params['id']],
+				['user_id', '=', $userInfo['id']]
+			];
+
+			// 查找是否存在该名片
+			$card = $cardModel->where($cardWhere)->find();
+			if (!$card) {
+				$this->error(__('Card not exists'));
+			}
+
+			// 查找是否有该分类
+			$typeWhere = [
+				['id', '=', $params['type']],
+				['user_id', '=', $userInfo['id']]
+			];
+			$type      = $typeModel->where($typeWhere)->find();
+			if (!$type) {
+				$this->error(__('Type not exists'));
+			}
+
+			// 如果存在type字段，将type字段的值赋值给type_id字段
+			$params['type_id'] = $type['id'];
+			unset($params['type']);
+
+			// 查找是否存在相同手机号
+			$map = [
+				['mobile', '<>', $params['mobile']],
+				['user_id', '=', $userInfo['id']],
+				['id', '=', $params['id']]
+			];
+
+			// 查找是否存在相同手机号
+			$card = $cardModel->where($map)->find();
+			if ($card) {
+				$this->error(__('Mobile already exists'));
+			}
+
+			// 更新数据
+			$params['user_id'] = $userInfo['id'];
+			$res               = $cardModel->update($params);
+
+			$newCard = $cardModel->where('id', $params['id'])->find();
+
+			if ($res) {
+				$this->success(__('Edit success'), $newCard);
+			} else {
+				$this->error(__('Edit failed'));
+			}
+		}
+	}
 }
