@@ -16,7 +16,7 @@ use Throwable;
 class Card extends Frontend
 {
 
-	protected array $noNeedPermission = ['*'];
+	// protected array $noNeedPermission = ['*'];
 
 	/**
 	 * 初始化
@@ -261,6 +261,43 @@ class Card extends Frontend
 			} else {
 				$this->error(__('Delete failed'));
 			}
+		} else {
+			$this->error(__('Method not allowed'));
+		}
+	}
+
+	/**
+	 * 获取名片详情
+	 * @return void
+	 * @throws DataNotFoundException
+	 * @throws DbException
+	 * @throws ModelNotFoundException
+	 */
+	public function info(): void
+	{
+		if ($this->request->isPost()) {
+			$params    = $this->request->post(['id']);
+			$cardModel = new \app\common\model\card\Card();
+			$userInfo  = $this->auth->getUserInfo();
+
+			$validate = new \app\api\validate\card\Card();
+			try {
+				$validate->scene('info')->check($params);
+			} catch (Throwable $e) {
+				$this->error($e->getMessage());
+			}
+
+			$map = [
+				['id', '=', $params['id']],
+				['user_id', '=', $userInfo['id']]
+			];
+
+			$card = $cardModel->where($map)->find();
+			if (!$card) {
+				$this->error(__('Card not exists'));
+			}
+
+			$this->success(__('Get success'), $card);
 		} else {
 			$this->error(__('Method not allowed'));
 		}
