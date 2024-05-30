@@ -219,4 +219,48 @@ class Card extends Frontend
 			}
 		}
 	}
+
+	/**
+	 * 删除名片
+	 * @return void
+	 * @throws Throwable
+	 * @throws DataNotFoundException
+	 * @throws DbException
+	 * @throws ModelNotFoundException
+	 */
+	public function del(): void
+	{
+		if ($this->request->isPost()) {
+			$params    = $this->request->post(['id']);
+			$cardModel = new \app\common\model\card\Card();
+			$userInfo  = $this->auth->getUserInfo();
+
+			$validate = new \app\api\validate\card\Card();
+			try {
+				$validate->scene('del')->check($params);
+			} catch (Throwable $e) {
+				$this->error($e->getMessage());
+			}
+
+			$map = [
+				['id', '=', $params['id']],
+				['user_id', '=', $userInfo['id']]
+			];
+
+			$card = $cardModel->where($map)->find();
+			if (!$card) {
+				$this->error(__('Card not exists'));
+			}
+
+			$res = $cardModel->where($map)->delete();
+
+			if ($res) {
+				$this->success(__('Delete success'));
+			} else {
+				$this->error(__('Delete failed'));
+			}
+		} else {
+			$this->error(__('Method not allowed'));
+		}
+	}
 }
