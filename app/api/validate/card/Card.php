@@ -30,6 +30,7 @@ class Card extends Validate
 		'add'   => ['nickname', 'mobile', 'gender', 'city', 'remark', 'type'],
 		'edit'  => ['id', 'nickname', 'mobile', 'gender', 'city', 'remark', 'type'],
 		'del'   => ['id,'],
+		'info'  => ['id'],
 	];
 
 	public function __construct()
