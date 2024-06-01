@@ -73,12 +73,21 @@ class Card extends Frontend
 			$map[] = ['user_id', '=', $userInfo['id']];
 
 
-			$res = $cardModel
+			$list = $cardModel
+				->field(['id', 'nickname', 'gender', 'mobile', 'city', 'remark', 'type_id', 'create_time', 'update_time'])
 				->where($map)
 				->page($params['page'], $params['limit'])
 				->select();
 
-			$this->success(__('Get success'), $res);
+			$this->success(
+				__('Get success'),
+				[
+					'list'  => $list,
+					'total' => $cardModel->where($map)->count(),
+					'page'  => $params['page'],
+					'limit' => $params['limit']
+				]
+			);
 		} else {
 			$this->error(__('Method not allowed'));
 		}
