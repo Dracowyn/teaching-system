@@ -2,6 +2,7 @@
 
 namespace app\common\model\card;
 
+use think\facade\Db;
 use think\Model;
 use think\model\relation\BelongsTo;
 
@@ -20,6 +21,7 @@ class Card extends Model
 	protected $append = [
 		'city_text',
 		'type_text',
+		'area',
 	];
 
 
@@ -40,7 +42,7 @@ class Card extends Model
 	public function getCityTextAttr($value, $row): string
 	{
 		if ($row['city'] === '' || $row['city'] === null) return '';
-		$cityNames = \think\facade\Db::name('area')->whereIn('id', $row['city'])->column('name');
+		$cityNames = Db::name('area')->whereIn('id', $row['city'])->column('name');
 		return $cityNames ? implode(',', $cityNames) : '';
 	}
 
@@ -59,5 +61,11 @@ class Card extends Model
 		// 根据当前type_id获取type表中的name
 		$type = Type::where('id', $row['type_id'])->field('name')->find();
 		return $type ? $type['name'] : '';
+	}
+
+	public function getAreaAttr(): array
+	{
+		$area = Db::name('area')->whereIn('id', $this->city)->column('code');
+		return $area ?: [];
 	}
 }
