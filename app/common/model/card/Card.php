@@ -2,7 +2,8 @@
 
 namespace app\common\model\card;
 
-use think\facade\Db;
+use app\admin\model\User;
+use app\common\model\Area;
 use think\Model;
 use think\model\relation\BelongsTo;
 
@@ -41,8 +42,9 @@ class Card extends Model
 
 	public function getCityTextAttr($value, $row): string
 	{
+		$areaModel = new Area();
 		if ($row['city'] === '' || $row['city'] === null) return '';
-		$cityNames = Db::name('area')->whereIn('id', $row['city'])->column('name');
+		$cityNames = $areaModel->whereIn('id', $row['city'])->column('name');
 		return $cityNames ? implode(',', $cityNames) : '';
 	}
 
@@ -53,19 +55,21 @@ class Card extends Model
 
 	public function user(): BelongsTo
 	{
-		return $this->belongsTo(\app\admin\model\User::class, 'user_id', 'id');
+		return $this->belongsTo(User::class, 'user_id', 'id');
 	}
 
 	public function getTypeTextAttr($value, $row): string
 	{
+		$typeModel = new Type();
 		// 根据当前type_id获取type表中的name
-		$type = Type::where('id', $row['type_id'])->field('name')->find();
+		$type = $typeModel->where('id', $row['type_id'])->field('name')->find();
 		return $type ? $type['name'] : '';
 	}
 
 	public function getAreaAttr(): array
 	{
-		$area = Db::name('area')->whereIn('id', $this->city)->column('code');
+		$areaModel = new Area();
+		$area      = $areaModel->whereIn('id', $this->city)->column('code');
 		return $area ?: [];
 	}
 }
