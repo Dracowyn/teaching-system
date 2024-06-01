@@ -147,7 +147,13 @@ class Type extends Frontend
 			$res = $type->update($params);
 
 			if ($res) {
-				$this->success(__('Edit success'));
+				$this->success(
+					__('Edit success'),
+					$type
+						->field(['id', 'name', 'create_time', 'update_time'])
+						->where($where)
+						->find()
+				);
 			} else {
 				$this->error(__('Edit failed'));
 			}
