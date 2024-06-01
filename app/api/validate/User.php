@@ -9,7 +9,7 @@ class User extends Validate
     protected $failException = true;
 
     protected $rule = [
-        'username'    => 'require|regex:^[a-zA-Z][a-zA-Z0-9_]{2,15}$|unique:user',
+        'username'    => 'require|regex:/^[\x{4E00}-\x{9FA5}A-Za-z][\x{4E00}-\x{9FA5}A-Za-z0-9_]+$/u|unique:user',
         'email'       => 'email|unique:user',
         'mobile'      => 'mobile|unique:user',
         'password'    => 'require|regex:^(?!.*[&<>"\'\n\r]).{6,32}$',

@@ -36,7 +36,9 @@ export function validatorAccount(rule: any, val: string, callback: Function) {
     if (!val) {
         return callback()
     }
-    if (!/^[a-zA-Z][a-zA-Z0-9_]{2,15}$/.test(val)) {
+
+    // if (!/^[a-zA-Z][a-zA-Z0-9_]{2,15}$/.test(val)) {
+    if (!/^[\u4e00-\u9fa5A-Za-z][\u4e00-\u9fa5A-Za-z0-9_]+$/.test(val)) {
         return callback(new Error(i18n.global.t('validate.Please enter the correct account')))
     }
     return callback()

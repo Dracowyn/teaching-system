@@ -241,7 +241,7 @@ class Auth extends \ba\Auth
         $validate    = Validate::rule([
             'mobile'   => 'mobile',
             'email'    => 'email',
-            'username' => 'regex:^[a-zA-Z][a-zA-Z0-9_]{2,15}$',
+            'username' => 'regex:/^[\x{4E00}-\x{9FA5}A-Za-z][\x{4E00}-\x{9FA5}A-Za-z0-9_]+$/u',
         ]);
         if ($validate->check(['mobile' => $username])) $accountType = 'mobile';
         if ($validate->check(['email' => $username])) $accountType = 'email';
