@@ -103,7 +103,13 @@ class Type extends Frontend
 			$res = $typeModel->save($params);
 
 			if ($res) {
-				$this->success(__('Add success'));
+				$this->success(
+					__('Add success'),
+					$typeModel
+						->field(['id', 'name', 'create_time', 'update_time'])
+						->where('id', '=', $typeModel->getKey())
+						->find()
+				);
 			} else {
 				$this->error(__('Add failed'));
 			}
