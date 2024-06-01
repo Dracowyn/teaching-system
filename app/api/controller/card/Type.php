@@ -247,4 +247,37 @@ class Type extends Frontend
 		}
 	}
 
+	/**
+	 * 获取名片分类列表
+	 * @return void
+	 * @throws DataNotFoundException
+	 * @throws DbException
+	 * @throws ModelNotFoundException
+	 */
+	public function list(): void
+	{
+		if ($this->request->isPost()) {
+			$typeModel = new \app\common\model\card\Type();
+			$userInfo  = $this->auth->getUserInfo();
+
+			$where = [
+				['user_id', '=', $userInfo['id']],
+			];
+
+			$list = $typeModel
+				->field(['id', 'name', 'create_time', 'update_time'])
+				->where($where)
+				->select();
+
+			$this->success(
+				__('Get success'),
+				[
+					'list'  => $list,
+					'total' => $typeModel->where($where)->count(),
+				]);
+		} else {
+			$this->error(__('Method not allowed'));
+		}
+	}
+
 }
