@@ -22,14 +22,15 @@ class Card extends Validate
 		'mobile'   => 'require|mobile',
 		'gender'   => 'number',
 		'city'     => 'require|string',
+		'area'     => 'string',
 		'remark'   => 'string',
 	];
 
 	protected $scene = [
 		'index' => ['type', 'search', 'page', 'limit'],
-		'add'   => ['nickname', 'mobile', 'gender', 'city', 'remark', 'type'],
-		'edit'  => ['id', 'nickname', 'mobile', 'gender', 'city', 'remark', 'type'],
-		'del'   => ['id,'],
+		'add'   => ['nickname', 'mobile', 'gender', 'area', 'remark', 'type'],
+		'edit'  => ['id', 'nickname', 'mobile', 'gender', 'area', 'remark', 'type'],
+		'del'   => ['id'],
 		'info'  => ['id'],
 	];
 
@@ -44,6 +45,7 @@ class Card extends Validate
 			'mobile'   => __('mobile'),
 			'gender'   => __('gender'),
 			'city'     => __('city'),
+			'area'     => __('area'),
 			'remark'   => __('remark'),
 		];
 		$this->message = array_merge($this->message, [
@@ -62,6 +64,7 @@ class Card extends Validate
 			'gender.regex'     => __('Please input correct gender'),
 			'city.require'     => __('Please input city'),
 			'city.regex'       => __('Please input correct city'),
+			'area.regex'       => __('Please input correct area'),
 			'remark.regex'     => __('Please input correct remark'),
 		]);
 		parent::__construct();
