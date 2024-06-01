@@ -28,6 +28,7 @@ class Type extends Validate
 		'add'    => ['name'],
 		'edit'   => ['id', 'name'],
 		'delete' => ['id'],
+		'info'   => ['id'],
 	];
 
 	public function __construct()
@@ -42,7 +43,7 @@ class Type extends Validate
 		$this->message = array_merge($this->message, [
 			'id.regex'     => __('Please input correct type id'),
 			'id.require'   => __('Please input type id'),
-			'name.require' => __('Please input name'),
+			'name.require' => __('Please input type name'),
 			'name.regex'   => __('Please input correct type name'),
 			'search.regex' => __('Please input correct search'),
 			'page.regex'   => __('Please input correct page'),
