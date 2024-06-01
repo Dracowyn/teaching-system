@@ -7,7 +7,7 @@
                     <div class="main-left">
                         <div class="main-title">{{ siteConfig.siteName }}</div>
                         <div class="main-content">
-                            {{ $t('index.Steve Jobs') }}
+                            {{ $t('index.Interest teacher') }}
                         </div>
                         <el-button
                             v-if="memberCenter.state.open"
