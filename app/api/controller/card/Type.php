@@ -57,12 +57,14 @@ class Type extends Frontend
 				->page($params['page'], $params['limit'])
 				->select();
 
-			$this->success('', [
-				'list'  => $list,
-				'total' => $typeModel->where($where)->count(),
-				'page'  => $params['page'],
-				'limit' => $params['limit'],
-			]);
+			$this->success(
+				__('Get success'),
+				[
+					'list'  => $list,
+					'total' => $typeModel->where($where)->count(),
+					'page'  => $params['page'],
+					'limit' => $params['limit'],
+				]);
 		} else {
 			$this->error(__('Method not allowed'));
 		}
@@ -247,7 +249,7 @@ class Type extends Frontend
 				$this->error(__('Type not exists'));
 			}
 
-			$this->success('Get success', $type);
+			$this->success(__('Get success'), $type);
 		} else {
 			$this->error(__('Method not allowed'));
 		}
