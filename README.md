@@ -1,6 +1,6 @@
 <br />
 <div align="center">
-    <h1 style="font-size: 36px;color: #2c3e50;font-weight: 600;margin: 0 0 6px 0;">Dracowyn实训教学系统</h1>
+    <h1 style="font-size: 36px;color: #2c3e50;font-weight: 600;margin: 0 0 6px 0;">Dracowyn实训项目教学系统</h1>
     <p style="font-size: 17px;color: #6a8bad;margin-bottom: 10px;">使用流行技术栈搭建的实训项目教学系统</p>
 </div>
 <br />
