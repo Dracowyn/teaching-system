@@ -301,7 +301,10 @@ class Card extends Frontend
 				['user_id', '=', $userInfo['id']]
 			];
 
-			$card = $cardModel->where($map)->find();
+			$card = $cardModel
+				->field(['id', 'nickname', 'gender', 'mobile', 'city', 'remark', 'type_id', 'create_time', 'update_time'])
+				->where($map)
+				->find();
 			if (!$card) {
 				$this->error(__('Card not exists'));
 			}
