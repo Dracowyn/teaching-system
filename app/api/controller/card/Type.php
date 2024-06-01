@@ -155,4 +155,48 @@ class Type extends Frontend
 			$this->error(__('Method not allowed'));
 		}
 	}
+
+	/**
+	 * 删除名片类型
+	 * @return void
+	 * @throws DataNotFoundException
+	 * @throws DbException
+	 * @throws ModelNotFoundException
+	 */
+	public function del(): void
+	{
+		if ($this->request->isPost()) {
+			$params    = $this->request->post(['id']);
+			$typeModel = new \app\common\model\card\Type();
+			$validate  = new \app\api\validate\card\Type();
+			$userInfo  = $this->auth->getUserInfo();
+
+			try {
+				$validate->scene('delete')->check($params);
+			} catch (Throwable $e) {
+				$this->error($e->getMessage());
+			}
+
+			$where = [
+				['id', '=', $params['id']],
+				['user_id', '=', $userInfo['id']],
+			];
+
+			$type = $typeModel->where($where)->find();
+
+			if (!$type) {
+				$this->error(__('Type not exists'));
+			}
+
+			$res = $type->delete();
+
+			if ($res) {
+				$this->success(__('Delete success'));
+			} else {
+				$this->error(__('Delete failed'));
+			}
+		} else {
+			$this->error(__('Method not allowed'));
+		}
+	}
 }
