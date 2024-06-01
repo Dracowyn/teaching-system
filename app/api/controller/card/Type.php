@@ -10,6 +10,7 @@ use app\common\controller\Frontend;
 use think\db\exception\DataNotFoundException;
 use think\db\exception\DbException;
 use think\db\exception\ModelNotFoundException;
+use Throwable;
 
 class Type extends Frontend
 {
@@ -38,7 +39,7 @@ class Type extends Frontend
 
 			try {
 				$validate->scene('index')->check($params);
-			} catch (\Throwable $e) {
+			} catch (Throwable $e) {
 				$this->error($e->getMessage());
 			}
 
@@ -62,6 +63,52 @@ class Type extends Frontend
 				'page'  => $params['page'],
 				'limit' => $params['limit'],
 			]);
+		} else {
+			$this->error(__('Method not allowed'));
+		}
+	}
+
+	/**
+	 * 添加名片类型
+	 * @return void
+	 * @throws DataNotFoundException
+	 * @throws DbException
+	 * @throws ModelNotFoundException
+	 */
+	public function add(): void
+	{
+		if ($this->request->isPost()) {
+			$params    = $this->request->post(['name']);
+			$typeModel = new \app\common\model\card\Type();
+			$validate  = new \app\api\validate\card\Type();
+			$userInfo  = $this->auth->getUserInfo();
+
+			try {
+				$validate->scene('add')->check($params);
+			} catch (Throwable $e) {
+				$this->error($e->getMessage());
+			}
+
+			$params['user_id'] = $userInfo['id'];
+
+			$where = [
+				['user_id', '=', $userInfo['id']],
+				['name', '=', $params['name']],
+			];
+
+			if ($typeModel->where($where)->find()) {
+				$this->error(__('Type already exists'));
+			}
+
+			$res = $typeModel->save($params);
+
+			if ($res) {
+				$this->success(__('Add success'));
+			} else {
+				$this->error(__('Add failed'));
+			}
+		} else {
+			$this->error(__('Method not allowed'));
 		}
 	}
 }
