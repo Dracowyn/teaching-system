@@ -1,7 +1,7 @@
 <br />
 <div align="center">
     <h1 style="font-size: 36px;color: #2c3e50;font-weight: 600;margin: 0 0 6px 0;">Dracowyn实训教学系统</h1>
-    <p style="font-size: 17px;color: #6a8bad;margin-bottom: 10px;">使用流行技术栈搭建的实训教学系统</p>
+    <p style="font-size: 17px;color: #6a8bad;margin-bottom: 10px;">使用流行技术栈搭建的实训项目教学系统</p>
 </div>
 <br />
 <p align="center">
@@ -31,7 +31,7 @@
 <br>
 
 ### 介绍
-🌈 基于 Vue3.3 + ThinkPHP8 + TypeScript + Vite + Pinia + Element Plus 等流行技术栈的实训教学系统。
+🌈 基于 Vue3.3 + ThinkPHP8 + TypeScript + Vite + Pinia + Element Plus 等流行技术栈的实训项目教学系统。主要为学生提供后端数据接口服务。
 
 ### 包含项目
 - 通讯录后端
