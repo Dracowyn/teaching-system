@@ -7,6 +7,7 @@
 namespace app\api\controller\card;
 
 use app\common\controller\Frontend;
+use app\common\model\Area;
 use app\common\model\card\Type;
 use think\db\exception\DataNotFoundException;
 use think\db\exception\DbException;
@@ -105,7 +106,7 @@ class Card extends Frontend
 	public function add(): void
 	{
 		if ($this->request->isPost()) {
-			$params    = $this->request->post(['nickname', 'mobile', 'gender', 'city', 'remark', 'type']);
+			$params    = $this->request->post(['nickname', 'mobile', 'gender', 'area', 'remark', 'type']);
 			$cardModel = new \app\common\model\card\Card();
 			$typeModel = new Type();
 			$validate  = new \app\api\validate\card\Card();
@@ -116,6 +117,10 @@ class Card extends Frontend
 			} catch (Throwable $e) {
 				$this->error($e->getMessage());
 			}
+
+			// 如果存在area字段，将area字段的值赋值给city字段
+			$params = $this->findArea($params);
+
 
 			// 验证type_id和user_id是否在type表中存在
 			$where = [
@@ -171,7 +176,7 @@ class Card extends Frontend
 	public function edit(): void
 	{
 		if ($this->request->isPost()) {
-			$params    = $this->request->post(['id', 'nickname', 'mobile', 'gender', 'city', 'remark', 'type']);
+			$params    = $this->request->post(['id', 'nickname', 'mobile', 'gender', 'area', 'remark', 'type']);
 			$cardModel = new \app\common\model\card\Card();
 			$typeModel = new Type();
 			$validate  = new \app\api\validate\card\Card();
@@ -207,6 +212,10 @@ class Card extends Frontend
 			// 如果存在type字段，将type字段的值赋值给type_id字段
 			$params['type_id'] = $type['id'];
 			unset($params['type']);
+
+			// 如果存在area字段，将area字段的值赋值给city字段
+			$params = $this->findArea($params);
+
 
 			// 查找是否存在相同手机号
 			$map = [
@@ -322,5 +331,28 @@ class Card extends Frontend
 		} else {
 			$this->error(__('Method not allowed'));
 		}
+	}
+
+	/**
+	 * 查找地区
+	 * @param mixed $params
+	 * @return mixed
+	 */
+	public function findArea(mixed $params): mixed
+	{
+		if (!empty($params['area'])) {
+			$areaModel = new Area();
+			// 查找地区是否存在
+			$area = explode(',', $params['area']);
+			// 要确保每个地区都存在
+			$areaList = $areaModel->whereIn('code', $area)->column('id');
+			// 如果地区数量不一致，说明有地区不存在
+			if (count($area) !== count($areaList)) {
+				$this->error(__('Area not exists'));
+			}
+
+			$params['city'] = $areaList;
+		}
+		return $params;
 	}
 }
