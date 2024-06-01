@@ -23,7 +23,7 @@ class Type extends Frontend
 	}
 
 	/**
-	 * 获取名片类型列表
+	 * 获取名片分类列表
 	 * @return void
 	 * @throws DataNotFoundException
 	 * @throws DbException
@@ -69,7 +69,7 @@ class Type extends Frontend
 	}
 
 	/**
-	 * 添加名片类型
+	 * 添加名片分类
 	 * @return void
 	 * @throws DataNotFoundException
 	 * @throws DbException
@@ -113,7 +113,7 @@ class Type extends Frontend
 	}
 
 	/**
-	 * 编辑名片类型
+	 * 编辑名片分类
 	 * @return void
 	 * @throws DataNotFoundException
 	 * @throws DbException
@@ -157,7 +157,7 @@ class Type extends Frontend
 	}
 
 	/**
-	 * 删除名片类型
+	 * 删除名片分类
 	 * @return void
 	 * @throws DataNotFoundException
 	 * @throws DbException
@@ -199,4 +199,46 @@ class Type extends Frontend
 			$this->error(__('Method not allowed'));
 		}
 	}
+
+	/**
+	 * 获取名片分类信息
+	 * @return void
+	 * @throws DataNotFoundException
+	 * @throws DbException
+	 * @throws ModelNotFoundException
+	 */
+	public function info(): void
+	{
+		if ($this->request->isPost()) {
+			$params    = $this->request->post(['id']);
+			$typeModel = new \app\common\model\card\Type();
+			$validate  = new \app\api\validate\card\Type();
+			$userInfo  = $this->auth->getUserInfo();
+
+			try {
+				$validate->scene('info')->check($params);
+			} catch (Throwable $e) {
+				$this->error($e->getMessage());
+			}
+
+			$where = [
+				['id', '=', $params['id']],
+				['user_id', '=', $userInfo['id']],
+			];
+
+			$type = $typeModel
+				->field(['id', 'name', 'create_time', 'update_time'])
+				->where($where)
+				->find();
+
+			if (!$type) {
+				$this->error(__('Type not exists'));
+			}
+
+			$this->success('Get success', $type);
+		} else {
+			$this->error(__('Method not allowed'));
+		}
+	}
+
 }
