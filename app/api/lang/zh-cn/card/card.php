@@ -14,6 +14,7 @@ return [
 	'mobile'                       => '手机号',
 	'gender'                       => '性别',
 	'city'                         => '城市',
+	'area'                         => '地区',
 	'remark'                       => '备注',
 	'Please input correct search'  => '请不要乱输入搜索内容',
 	'Please input correct type id' => '请输入正确的数字分类ID',
@@ -29,6 +30,7 @@ return [
 	'Please input correct gender'  => '请输入正确的性别',
 	'Please input city'            => '请输入城市',
 	'Please input correct city'    => '请输入正确的城市',
+	'Please input correct area'    => '请输入正确的地区',
 	'Please input correct remark'  => '请不要乱输入备注',
 
 	// 控制器
@@ -46,4 +48,5 @@ return [
 	'Delete failed'                => '删除失败',
 	'Method not allowed'           => '不允许的方法',
 	'Mobile already exists'        => '手机号已存在',
+	'Area not exists'               => '地区不存在',
 ];
