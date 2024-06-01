@@ -111,4 +111,48 @@ class Type extends Frontend
 			$this->error(__('Method not allowed'));
 		}
 	}
+
+	/**
+	 * 编辑名片类型
+	 * @return void
+	 * @throws DataNotFoundException
+	 * @throws DbException
+	 * @throws ModelNotFoundException
+	 */
+	public function edit(): void
+	{
+		if ($this->request->isPost()) {
+			$params    = $this->request->post(['id', 'name']);
+			$typeModel = new \app\common\model\card\Type();
+			$validate  = new \app\api\validate\card\Type();
+			$userInfo  = $this->auth->getUserInfo();
+
+			try {
+				$validate->scene('edit')->check($params);
+			} catch (Throwable $e) {
+				$this->error($e->getMessage());
+			}
+
+			$where = [
+				['id', '=', $params['id']],
+				['user_id', '=', $userInfo['id']],
+			];
+
+			$type = $typeModel->where($where)->find();
+
+			if (!$type) {
+				$this->error(__('Type not exists'));
+			}
+
+			$res = $type->update($params);
+
+			if ($res) {
+				$this->success(__('Edit success'));
+			} else {
+				$this->error(__('Edit failed'));
+			}
+		} else {
+			$this->error(__('Method not allowed'));
+		}
+	}
 }
