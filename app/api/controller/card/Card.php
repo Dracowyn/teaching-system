@@ -204,9 +204,9 @@ class Card extends Frontend
 
 			// 查找是否存在相同手机号
 			$map = [
-				['mobile', '<>', $params['mobile']],
+				['id', '<>', $params['id']],
+				['mobile', '=', $params['mobile']],
 				['user_id', '=', $userInfo['id']],
-				['id', '=', $params['id']]
 			];
 
 			// 查找是否存在相同手机号
@@ -219,7 +219,10 @@ class Card extends Frontend
 			$params['user_id'] = $userInfo['id'];
 			$res               = $cardModel->update($params);
 
-			$newCard = $cardModel->where('id', $params['id'])->find();
+			$newCard = $cardModel
+				->field(['id', 'nickname', 'gender', 'mobile', 'city', 'remark', 'type_id', 'create_time', 'update_time'])
+				->where('id', $params['id'])
+				->find();
 
 			if ($res) {
 				$this->success(__('Edit success'), $newCard);
