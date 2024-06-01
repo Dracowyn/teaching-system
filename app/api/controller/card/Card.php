@@ -145,7 +145,13 @@ class Card extends Frontend
 			$res = $cardModel->save($params);
 
 			if ($res) {
-				$this->success(__('Add success'));
+				$this->success(
+					__('Add success'),
+					$cardModel
+						->field(['id', 'nickname', 'gender', 'mobile', 'city', 'remark', 'type_id', 'create_time', 'update_time'])
+						->where('id', $cardModel->getKey())
+						->find()
+				);
 			} else {
 				$this->error(__('Add failed'));
 			}
