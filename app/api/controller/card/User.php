@@ -54,13 +54,6 @@ class User extends Frontend
 				$this->error($e->getMessage());
 			}
 
-			$attachUrl = '';
-			try {
-				$attachUrl = get_sys_config('attach_url');
-			} catch (Throwable $e) {
-				$this->error($e->getMessage());
-			}
-
 			$data = $this->getUserInfoData();
 
 			if ($res === true) {
