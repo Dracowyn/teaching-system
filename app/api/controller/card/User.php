@@ -71,6 +71,11 @@ class User extends Frontend
 		}
 	}
 
+	/**
+	 * 注册
+	 * @return void
+	 * @throws Exception
+	 */
 	public function register(): void
 	{
 		// 检查登录态
@@ -111,20 +116,30 @@ class User extends Frontend
 			}
 
 			// 创建默认通讯录名片分类
-			$cardTypeModel = new Type();
-			$cardTypeModel->save([
-				'name'    => '默认分类',
+			$cardTypeModel  = new Type();
+			$typeData       = [
+				['name' => '默认分类1'],
+				['name' => '默认分类2'],
+				['name' => '默认分类3'],
+				['name' => '默认分类4'],
+				['name' => '默认分类5'],
+			];
+			$commonTypeData = [
 				'user_id' => $userInfo['id'],
-			]);
+			];
+			foreach ($typeData as &$data) {
+				$data = array_merge($data, $commonTypeData);
+			}
+			$cardTypeModel->saveAll($typeData);
 
-			if (!$cardTypeModel->getLastInsID()) {
+			// 获取创建的分类ID数组
+			$typeIds = $cardTypeModel->where('user_id', '=', $userInfo['id'])->column('id');
+
+			if (empty($typeIds)) {
 				// 回滚事务
 				Db::rollback();
 				$this->error('创建通讯录名片分类失败');
 			}
-
-			// 获取分类ID
-			$typeId = $cardTypeModel->getLastInsID();
 
 			// 创建默认多个通讯录名片
 			$cardModel = new Card();
@@ -144,15 +159,19 @@ class User extends Frontend
 			];
 
 			// 公共的城市和类型数据
-			$commonData = [
+			$commonCardData = [
 				'city'    => '1,2,3',
-				'type_id' => $typeId,
 				'user_id' => $userInfo['id'],
 			];
 
 			// 合并数据
 			foreach ($cardData as &$data) {
-				$data = array_merge($data, $commonData);
+				$data = array_merge($data, $commonCardData);
+			}
+
+			// 为每个名片数据添加随机的分类ID
+			foreach ($cardData as &$data) {
+				$data['type_id'] = $typeIds[array_rand($typeIds)];
 			}
 
 			try {
