@@ -184,6 +184,9 @@ class User extends Frontend
 				$this->error($e->getMessage());
 			}
 
+			// 提交事务
+			Db::commit();
+
 			$this->success(__('Registration successful'), $userInfo);
 		}
 	}
