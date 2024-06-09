@@ -44,7 +44,7 @@ class Frontend extends Api
 
             // 初始化会员鉴权实例
             $this->auth = Auth::instance();
-            $token      = get_auth_token(['ba', 'user', 'token']);
+            $token      = get_auth_token(['user', 'token']);
             if ($token) $this->auth->init($token);
 
         } catch (TokenExpirationException) {

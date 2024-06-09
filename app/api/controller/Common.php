@@ -82,7 +82,7 @@ class Common extends Api
 
         // 会员token刷新
         if ($refreshToken['type'] == UserAuth::TOKEN_TYPE . '-refresh') {
-            $baUserToken = get_auth_token(['ba', 'user', 'token']);
+            $baUserToken = get_auth_token(['user', 'token']);
             if (!$baUserToken) {
                 $this->error(__('Invalid token'));
             }

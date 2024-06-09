@@ -45,7 +45,7 @@ class Index extends Frontend
 
                 // 触发可能的 token 过期异常
                 try {
-                    $token = get_auth_token(['ba', 'user', 'token']);
+                    $token = get_auth_token(['user', 'token']);
                     $this->auth->init($token);
                 } catch (TokenExpirationException) {
                     $this->error(__('Token expiration'), [], 409);
