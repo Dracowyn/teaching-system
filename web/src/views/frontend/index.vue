@@ -30,7 +30,7 @@
 </template>
 
 <script setup lang="ts">
-import indexCover from '/@/assets/index/index-cover.svg'
+import indexCover from '/@/assets/index/dracowyn-logo.webp'
 import { useSiteConfig } from '/@/stores/siteConfig'
 import { useMemberCenter } from '/@/stores/memberCenter'
 import Header from '/@/layouts/frontend/components/header.vue'
@@ -59,7 +59,8 @@ const memberCenter = useMemberCenter()
             width: 66%;
             margin: 0 auto;
             align-items: center;
-            justify-content: space-between;
+            justify-content: space-around;
+            flex-direction: row-reverse;
             .main-left {
                 padding-right: 50px;
                 .main-title {
@@ -73,7 +74,7 @@ const memberCenter = useMemberCenter()
             }
             .main-right {
                 img {
-                    width: 380px;
+                    width: 300px;
                 }
             }
         }
