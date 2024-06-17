@@ -33,18 +33,26 @@ class Hello extends Frontend
 	 */
 	public function index(): void
 	{
+		$msg = 'Hello World!';
+
 		$data = [
 			'get'    => $this->request->get(),
 			'post'   => $this->request->post(),
 			'method' => $this->request->method(),
 		];
 
+		// 获取post里边的name
+		if ($this->request->post('name')) {
+			// Hello name!
+			$msg = 'Hello ' . $this->request->post('name') . '!';
+		}
+
 		if ($this->request->isGet()) {
-			$this->success('Hello World!', $data);
+			$this->success($msg, $data);
 		}
 
 		if ($this->request->isPost()) {
-			$this->success('Hello World!', $data);
+			$this->success($msg, $data);
 		}
 	}
 
