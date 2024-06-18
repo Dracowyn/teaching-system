@@ -89,12 +89,13 @@ if (!function_exists('echo_value')) {
     }
 }
 ?>
+<?php if (\think\facade\App::isDebug()) { ?>
 <!DOCTYPE html>
-<html lang="">
+<html lang="zh">
 <head>
     <meta charset="UTF-8">
-    <?php if (\think\facade\App::isDebug()) { ?>
     <title>系统发生错误</title>
+    <meta name="robots" content="noindex,nofollow" />
     <style>
 		/* Base */
 		body {
@@ -294,13 +295,8 @@ if (!function_exists('echo_value')) {
 		pre.prettyprint .dec, pre.prettyprint .var { color: #606 }  /* a declaration; a variable name */
 		pre.prettyprint .fun { color: red }  /* a function name */
     </style>
-    <?php } else { ?>
-    <title>该对象不存在</title>
-    <?php } ?>
-    <meta name="robots" content="noindex,nofollow" />
 </head>
 <body>
-    <?php if (\think\facade\App::isDebug()) { ?>
         <?php foreach ($traces as $index => $trace) { ?>
     <div class="exception">
         <div class="message">
@@ -345,11 +341,6 @@ if (!function_exists('echo_value')) {
         </div>
     </div>
         <?php } ?>
-    <?php } else { ?>
-    <div class="exception">
-        <div class="info"><h1><?php echo htmlentities($message); ?></h1></div>
-    </div>
-    <?php } ?>
 
     <?php if (!empty($datas)) { ?>
     <div class="exception-var">
@@ -498,3 +489,7 @@ if (!function_exists('echo_value')) {
     <?php } ?>
 </body>
 </html>
+
+<?php } else { ?>
+404 Not Found
+<?php } ?>
