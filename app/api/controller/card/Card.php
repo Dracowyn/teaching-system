@@ -54,7 +54,7 @@ class Card extends Frontend
 			$map = [];
 
 			if (!empty($params['search'])) {
-				$map[] = ['name', 'like', '%' . $params['search'] . '%'];
+				$map[] = ['nickname', 'like', '%' . $params['search'] . '%'];
 			}
 
 
