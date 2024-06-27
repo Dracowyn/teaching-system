@@ -54,6 +54,7 @@ class Type extends Frontend
 			$list = $typeModel
 				->field(['id', 'name', 'create_time', 'update_time'])
 				->where($where)
+				->order('id', 'desc')
 				->page($params['page'], $params['limit'])
 				->select();
 
