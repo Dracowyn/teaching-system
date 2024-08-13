@@ -3,7 +3,11 @@
         <el-upload
             ref="upload"
             class="ba-upload"
-            :class="[type, hideImagePlusOnOverLimit && state.attrs.limit && state.fileList.length >= state.attrs.limit ? 'hide-image-plus' : '']"
+            :class="[
+                type,
+                state.attrs.disabled ? 'is-disabled' : '',
+                hideImagePlusOnOverLimit && state.attrs.limit && state.fileList.length >= state.attrs.limit ? 'hide-image-plus' : '',
+            ]"
             v-model:file-list="state.fileList"
             :auto-upload="false"
             @change="onElChange"
@@ -17,7 +21,7 @@
             <template v-if="$slots.default" #default><slot name="default"></slot></template>
             <template v-else #default>
                 <template v-if="type == 'image' || type == 'images'">
-                    <div v-if="!hideSelectFile" @click.stop="state.selectFile.show = true" class="ba-upload-select-image">
+                    <div v-if="!hideSelectFile" @click.stop="showSelectFile()" class="ba-upload-select-image">
                         {{ $t('utils.choice') }}
                     </div>
                     <Icon class="ba-upload-icon" name="el-icon-Plus" size="30" color="#c0c4cc" />
@@ -27,7 +31,7 @@
                         <Icon name="el-icon-Plus" color="#ffffff" />
                         <span>{{ $t('Upload') }}</span>
                     </el-button>
-                    <el-button v-blur v-if="!hideSelectFile" @click.stop="state.selectFile.show = true" type="success">
+                    <el-button v-blur v-if="!hideSelectFile" @click.stop="showSelectFile()" type="success">
                         <Icon name="fa fa-th-list" size="14px" color="#ffffff" />
                         <span class="ml-6">{{ $t('utils.choice') }}</span>
                     </el-button>
@@ -64,7 +68,6 @@ defineOptions({
     inheritAttrs: false,
 })
 
-type Writeable<T> = { -readonly [P in keyof T]: T[P] }
 interface Props extends /* @vue-ignore */ Partial<UploadProps> {
     type: 'image' | 'images' | 'file' | 'files'
     // 上传请求时的额外携带数据
@@ -74,7 +77,7 @@ interface Props extends /* @vue-ignore */ Partial<UploadProps> {
     returnFullUrl?: boolean
     // 隐藏附件选择器
     hideSelectFile?: boolean
-    // 可自定义 el-upload 的其他属性（已废弃，v2.1.0 删除，请直接传递为 props）
+    // 可自定义 el-upload 的其他属性（已废弃，v2.2.0 删除，请直接传递为 props）
     attr?: Partial<Writeable<UploadProps>>
     // 强制上传到本地存储
     forceLocal?: boolean
@@ -181,7 +184,7 @@ const onElChange = (file: UploadFileExt, files: UploadFiles) => {
     fileUpload(fd, { uuid: uuid() }, props.forceLocal, {
         onUploadProgress: (evt: AxiosProgressEvent) => {
             const progressEvt = evt as UploadProgressEvent
-            if (evt.total && evt.total > 0) {
+            if (evt.total && evt.total > 0 && ['ready', 'uploading'].includes(file.status!)) {
                 progressEvt.percent = (evt.loaded / evt.total) * 100
                 file.status = 'uploading'
                 file.percentage = Math.round(progressEvt.percent)
@@ -295,7 +298,7 @@ onMounted(() => {
             }
         }
 
-        console.warn('图片/文件上传组件的 props.attr 已经弃用，并将于 v2.1.0 版本彻底删除，请将 props.attr 的部分直接作为 props 传递！')
+        console.warn('图片/文件上传组件的 props.attr 已经弃用，并将于 v2.2.0 版本彻底删除，请将 props.attr 的部分直接作为 props 传递！')
     }
     // 即将废弃的 props.attr End
 
@@ -398,6 +401,7 @@ const getRef = () => {
 }
 
 const showSelectFile = () => {
+    if (state.attrs.disabled) return
     state.selectFile.show = true
 }
 
@@ -437,6 +441,7 @@ watch(
     text-align: center;
     font-size: var(--el-font-size-extra-small);
     color: var(--el-text-color-regular);
+    user-select: none;
     &:hover {
         color: var(--el-color-primary);
         border: 1px dashed var(--el-color-primary);
@@ -492,5 +497,10 @@ watch(
 }
 .ba-upload.hide-image-plus :deep(.el-upload--picture-card) {
     display: none;
+}
+.ba-upload.is-disabled :deep(.el-upload),
+.ba-upload.is-disabled :deep(.el-upload) .el-button,
+.ba-upload.is-disabled :deep(.el-upload--picture-card) {
+    cursor: not-allowed;
 }
 </style>

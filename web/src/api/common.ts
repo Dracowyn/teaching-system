@@ -9,6 +9,7 @@ import { state as uploadExpandState, fileUpload as uploadExpand } from '/@/compo
 import type { AxiosRequestConfig } from 'axios'
 import { uuid } from '/@/utils/random'
 import { i18n } from '../lang'
+import { adminBaseRoutePath } from '/@/router/static/adminBase'
 
 /*
  * 公共请求函数和Url定义
@@ -16,13 +17,13 @@ import { i18n } from '../lang'
 
 // Admin模块
 export const adminUploadUrl = '/admin/ajax/upload'
-export const adminBuildSuffixSvgUrl = '/admin/ajax/buildSuffixSvg'
+export const adminBuildSuffixSvgUrl = adminBaseRoutePath + '/ajax/buildSuffixSvg'
 export const adminAreaUrl = '/admin/ajax/area'
 export const getTablePkUrl = '/admin/ajax/getTablePk'
 export const getTableListUrl = '/admin/ajax/getTableList'
 export const getTableFieldListUrl = '/admin/ajax/getTableFieldList'
 export const getDatabaseConnectionListUrl = '/admin/ajax/getDatabaseConnectionList'
-export const terminalUrl = '/admin/ajax/terminal'
+export const terminalUrl = adminBaseRoutePath + '/ajax/terminal'
 export const changeTerminalConfigUrl = '/admin/ajax/changeTerminalConfig'
 export const clearCacheUrl = '/admin/ajax/clearCache'
 
@@ -51,7 +52,7 @@ export function fileUpload(fd: FormData, params: anyObj = {}, forceLocal = false
         errorMsg = i18n.global.t('utils.The data of the uploaded file is incomplete!')
     } else if (!checkFileMimetype(file.name, file.type)) {
         errorMsg = i18n.global.t('utils.The type of uploaded file is not allowed!')
-    } else if (file.size > siteConfig.upload.maxsize) {
+    } else if (file.size > siteConfig.upload.maxSize) {
         errorMsg = i18n.global.t('utils.The size of the uploaded file exceeds the allowed range!')
     }
     if (errorMsg) {
@@ -59,6 +60,7 @@ export function fileUpload(fd: FormData, params: anyObj = {}, forceLocal = false
             ElNotification({
                 type: 'error',
                 message: errorMsg,
+                zIndex: 9999,
             })
             reject(errorMsg)
         })
