@@ -105,7 +105,7 @@ class WsBusiness
             ]);
         }
 
-        $app->init(self::$serverData);
+        $app->init(self::$serverData ?? []);
 
         $http     = $app->http;
         $response = $http->run();

@@ -45,7 +45,7 @@ class Monitor
     {
         clearstatcache();
         if (is_file(static::$lockFile)) {
-            unlink(static::$lockFile);
+            @unlink(static::$lockFile);
         }
     }
 
@@ -67,15 +67,13 @@ class Monitor
         $disableFunctions = explode(',', ini_get('disable_functions'));
         if (in_array('exec', $disableFunctions, true)) {
             echo "\nMonitor file change turned off because exec() has been disabled by disable_functions setting in " . PHP_CONFIG_FILE_PATH . "/php.ini\n";
-        } else {
-            if (DIRECTORY_SEPARATOR === '/' && (!Worker::$daemonize || !empty($this->options['switch']))) {
-                Timer::add($this->options['interval'], [$this, 'checkAllFilesChange']);
-            }
+        } elseif (DIRECTORY_SEPARATOR === '/' && (!Worker::$daemonize || !empty($this->options['switch']))) {
+            Timer::add($this->options['interval'], [$this, 'checkAllFilesChange']);
         }
 
         $memoryLimit = $this->getMemoryLimit($this->options['memory_limit'] ?? null);
         if ($memoryLimit && DIRECTORY_SEPARATOR === '/') {
-            Timer::add(60, [$this, 'checkMemory'], [$memoryLimit]);
+            Timer::add($this->options['memory_monitor_interval'], [$this, 'checkMemory'], [$memoryLimit]);
         }
     }
 
@@ -203,9 +201,9 @@ class Monitor
         $unit = strtolower($memoryLimit[strlen($memoryLimit) - 1]);
         if ($unit === 'g') {
             $memoryLimit = 1024 * (int)$memoryLimit;
-        } else if ($unit === 'm') {
+        } elseif ($unit === 'm') {
             $memoryLimit = (int)$memoryLimit;
-        } else if ($unit === 'k') {
+        } elseif ($unit === 'k') {
             $memoryLimit = ((int)$memoryLimit / 1024);
         } else {
             $memoryLimit = ((int)$memoryLimit / (1024 * 1024));

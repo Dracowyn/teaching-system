@@ -37,9 +37,10 @@ class Http
      */
     protected static array $serverData;
 
-    protected static ?\think\Db $db = null;
-
-    protected static Worker $worker;
+    /**
+     * 需要绑定到 app 的类实例
+     */
+    protected static array $bind = [];
 
     /**
      * 构造函数
@@ -54,8 +55,8 @@ class Http
      */
     public function onWorkerStart(Worker $worker): void
     {
-        self::$worker     = $worker;
-        self::$serverData = $_SERVER;
+        self::$bind['worker'] = $worker;
+        self::$serverData     = $_SERVER;
 
         // 文件监听配置
         if (!self::$monitorConfig) {
@@ -63,11 +64,12 @@ class Http
         }
 
         // 初始化 Db 类单例，并在所有进程中共用
-        if (!self::$db) {
+        if (!isset(self::$bind['db'])) {
             try {
                 Db::execute("SELECT 1");
-                $app      = App::getInstance();
-                self::$db = $app->db;
+                $app                 = App::getInstance();
+                self::$bind['db']    = $app->db;
+                self::$bind['cache'] = $app->cache;
             } catch (PDOException) {
             }
         }
@@ -82,9 +84,10 @@ class Http
      */
     public function onMessage(TcpConnection $connection, Request $request): void
     {
-        $app         = new WorkerHttpApp(root_path());
-        $app->db     = self::$db;
-        $app->worker = self::$worker;
+        $app = new WorkerHttpApp(root_path());
+        foreach (self::$bind as $key => $item) {
+            $app->$key = $item;
+        }
         $app->init($connection, $request, self::$serverData);
 
         $path = $request->path() ?: '/';
