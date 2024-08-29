@@ -80,14 +80,14 @@ export default {
     'field comment': '字段注释',
     'Please select a field from the left first': '请先从左侧选择一个字段',
     Common: '常用',
-    generate: '生成为',
+    'Generate type': '生成类型',
     'Field comments (CRUD dictionary)': '字段注释（CRUD字典）',
     'Field Properties': '字段属性',
     'Field Type': '字段类型',
     length: '长度',
     'decimal point': '小数点',
     'Field Defaults': '字段默认值',
-    'You can directly enter null, 0, empty string': '可以直接输入null、0、empty string',
+    'Please input the default value': '请输入默认值',
     'Auto increment': '自动递增',
     Unsigned: '无符号',
     'Allow NULL': '允许NULL',
@@ -149,4 +149,6 @@ export default {
     'Design remote select tips':
         '将自动根据表名生成本字段的名称；确认生成时，字段名 user_id 生成的关联方法名为 user，字段名 developer_done_id 生成的关联方法名为 developerDone，请注意远程下拉字段的名称前缀不要重复',
     'Vite hot warning': '未找到 Vite 热更新服务，请在开发环境生成代码，或点击右上角的WEB终端重新发布',
+    'Reset generate type attr': '字段生成类型已修改，是否将字段设计重置为新类型预设的方案？',
+    'Design efficiency': '自行确定设计有效性',
 }
