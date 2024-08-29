@@ -30,7 +30,7 @@
 </template>
 
 <script setup lang="ts">
-import indexCover from '/@/assets/index/dracowyn-logo.webp'
+import indexCover from '/@/assets/index/avatar.webp'
 import { useSiteConfig } from '/@/stores/siteConfig'
 import { useMemberCenter } from '/@/stores/memberCenter'
 import Header from '/@/layouts/frontend/components/header.vue'
