@@ -93,6 +93,13 @@ function createAxios<Data = any, T = ApiPromise<Data>>(axiosConfig: AxiosRequest
                 if (token) (config.headers as anyObj).batoken = token
                 const userToken = options.anotherToken || userInfo.getToken()
                 if (userToken) (config.headers as anyObj)['user-token'] = userToken
+
+                // 判断请求域名是否为buildadmin.com,如果是则移除token
+                if (config.url && config.url.includes('buildadmin.com')) {
+                    delete (config.headers as anyObj)['user-token']
+                    // 加入ba-user-token
+                    if (userToken) (config.headers as anyObj)['ba-user-token'] = userToken
+                }
             }
 
             return config
