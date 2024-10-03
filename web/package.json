@@ -6,8 +6,8 @@
     "scripts": {
         "dev": "vite --force",
         "build": "vite build && esno ./src/utils/build.ts",
-        "lint": "eslint --ext .js,.jsx,.ts,.vue src",
-        "lint-fix": "eslint --ext .js,.jsx,.ts,.vue src --fix",
+        "lint": "eslint .",
+        "lint-fix": "eslint --fix .",
         "format": "npx prettier --write .",
         "typecheck": "vue-tsc --noEmit"
     },
@@ -21,8 +21,9 @@
         "lodash-es": "4.17.21",
         "mitt": "3.0.1",
         "nprogress": "0.2.0",
-        "pinia": "2.1.7",
-        "pinia-plugin-persistedstate": "3.2.1",
+        "pinia": "2.2.2",
+        "pinia-plugin-persistedstate": "4.0.2",
+        "qrcode.vue": "3.4.1",
         "screenfull": "6.0.2",
         "sortablejs": "1.15.2",
         "v-code-diff": "1.12.1",

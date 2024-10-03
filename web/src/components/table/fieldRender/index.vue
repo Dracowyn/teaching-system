@@ -41,7 +41,7 @@
     <!-- tag -->
     <div v-if="field.render == 'tag' && fieldValue !== ''">
         <el-tag :type="getTagType(fieldValue, field.custom)" :effect="field.effect ?? 'light'" :size="field.size ?? 'default'">
-            {{ field.replaceValue ? field.replaceValue[fieldValue] : fieldValue }}
+            {{ field.replaceValue ? field.replaceValue[fieldValue] ?? fieldValue : fieldValue }}
         </el-tag>
     </div>
 
@@ -68,8 +68,8 @@
                 :effect="field.effect ?? 'light'"
                 :size="field.size ?? 'default'"
             >
-                {{ field.replaceValue ? field.replaceValue[fieldValue] ?? fieldValue : fieldValue }}</el-tag
-            >
+                {{ field.replaceValue ? field.replaceValue[fieldValue] ?? fieldValue : fieldValue }}
+            </el-tag>
         </template>
     </div>
 
@@ -115,7 +115,7 @@
 
     <!-- 按钮组 -->
     <!-- 只对默认的编辑、删除、排序按钮进行鉴权，其他按钮请通过 display 属性控制按钮是否显示 -->
-    <div v-if="field.render == 'buttons' && field.buttons">
+    <div v-if="field.render == 'buttons' && field.buttons" v-memo="[field]">
         <template v-for="(btn, idx) in field.buttons" :key="idx">
             <template v-if="btn.display ? btn.display(row, field) : true">
                 <!-- 常规按钮 -->

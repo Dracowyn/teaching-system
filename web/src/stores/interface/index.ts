@@ -101,10 +101,11 @@ export interface Terminal {
     showDot: boolean
     taskList: TaskItem[]
     packageManager: string
-    showPackageManagerDialog: boolean
     showConfig: boolean
     automaticCleanupTask: string
-    port: string
+    phpDevelopmentServer: boolean
+    npmRegistry: string
+    composerRegistry: string
 }
 
 export interface SiteConfig {

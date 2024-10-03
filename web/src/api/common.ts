@@ -190,22 +190,17 @@ export function buildTerminalUrl(commandKey: string, uuid: string, extend: strin
  * 请求修改终端配置
  */
 export function postChangeTerminalConfig(data: { manager?: string; port?: string }) {
-    return createAxios(
-        {
-            url: changeTerminalConfigUrl,
-            method: 'POST',
-            data: data,
-        },
-        {
-            loading: true,
-        }
-    )
+    return createAxios({
+        url: changeTerminalConfigUrl,
+        method: 'POST',
+        data: data,
+    })
 }
 
 /**
  * 远程下拉框数据获取
  */
-export function getSelectData(remoteUrl: string, q: string, params: {}) {
+export function getSelectData(remoteUrl: string, q: string, params: anyObj = {}) {
     return createAxios({
         url: remoteUrl,
         method: 'get',
