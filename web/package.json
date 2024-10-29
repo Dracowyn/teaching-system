@@ -32,7 +32,8 @@
         "vue-qr": "4.0.9",
         "vue-router": "4.4.3",
         "@wangeditor/editor": "^5.1.1",
-        "@wangeditor/editor-for-vue": "^5.1.12"
+        "@wangeditor/editor-for-vue": "^5.1.12",
+        "print-js": "^1.6.0"
     },
     "devDependencies": {
         "@types/lodash-es": "4.17.12",
