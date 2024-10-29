@@ -14,13 +14,14 @@
 </template>
 
 <script setup lang="ts">
-import '@wangeditor/editor/dist/css/style.css' // 引入 css
-import { onBeforeUnmount, reactive, shallowRef, onMounted, CSSProperties, watch } from 'vue'
-import { IEditorConfig, IToolbarConfig, i18nChangeLanguage } from '@wangeditor/editor'
-import { Editor, Toolbar } from '@wangeditor/editor-for-vue'
-import { useConfig } from '/@/stores/config'
-import { fileUpload } from '/@/api/common'
+import type { IEditorConfig, IToolbarConfig } from '@wangeditor-next/editor'
+import { i18nChangeLanguage } from '@wangeditor-next/editor'
+import { Editor, Toolbar } from '@wangeditor-next/editor-for-vue'
+import '@wangeditor-next/editor/dist/css/style.css'
 import NProgress from 'nprogress'
+import { CSSProperties, onBeforeUnmount, onMounted, reactive, shallowRef, watch } from 'vue'
+import { fileUpload } from '/@/api/common'
+import { useConfig } from '/@/stores/config'
 
 interface Props {
     // 编辑区高度
@@ -89,47 +90,48 @@ onMounted(() => {
     i18nChangeLanguage(config.lang.defaultLang == 'zh-cn' ? 'zh-CN' : config.lang.defaultLang)
     state.editorConfig.placeholder = props.placeholder
 
-    // 图片上传配置
-    state.editorConfig.MENU_CONF = {}
-    state.editorConfig.MENU_CONF['uploadImage'] = {
-        fieldName: 'file',
-        maxFileSize: 10 * 1024 * 1024, // 10M
-        async customUpload(file: File, insertFn: ImgInsertFnType) {
-            NProgress.configure({ showSpinner: true, trickle: false })
-            NProgress.start()
-            let fd = new FormData()
-            fd.append('file', file)
-            fileUpload(fd, {}, props.fileForceLocal, {
-                onUploadProgress: (evt) => {
-                    NProgress.set(evt.progress!)
-                },
-            }).then((res) => {
-                if (res.code == 1) {
-                    insertFn(res.data.file.full_url, res.data.file.name, res.data.file.full_url)
-                }
-                NProgress.done()
-            })
+    // 图片视频上传配置
+    state.editorConfig.MENU_CONF = {
+        uploadImage: {
+            fieldName: 'file',
+            maxFileSize: 10 * 1024 * 1024, // 10M
+            // @ts-expect-error 库类型定义缺失
+            async customUpload(file: File, insertFn: ImgInsertFnType) {
+                NProgress.configure({ showSpinner: true, trickle: false })
+                NProgress.start()
+                let fd = new FormData()
+                fd.append('file', file)
+                fileUpload(fd, {}, props.fileForceLocal, {
+                    onUploadProgress: (evt) => {
+                        NProgress.set(evt.progress!)
+                    },
+                }).then((res) => {
+                    if (res.code == 1) {
+                        insertFn(res.data.file.full_url, res.data.file.name, res.data.file.full_url)
+                    }
+                    NProgress.done()
+                })
+            },
         },
-    }
-
-    // 视频上传配置
-    state.editorConfig.MENU_CONF['uploadVideo'] = {
-        fieldName: 'file',
-        async customUpload(file: File, insertFn: VideoInsertFnType) {
-            NProgress.configure({ showSpinner: true, trickle: false })
-            NProgress.start()
-            let fd = new FormData()
-            fd.append('file', file)
-            fileUpload(fd, {}, props.fileForceLocal, {
-                onUploadProgress: (evt) => {
-                    NProgress.set(evt.progress!)
-                },
-            }).then((res) => {
-                if (res.code == 1) {
-                    insertFn(res.data.file.full_url)
-                }
-                NProgress.done()
-            })
+        uploadVideo: {
+            fieldName: 'file',
+            // @ts-expect-error 库类型定义缺失
+            async customUpload(file: File, insertFn: VideoInsertFnType) {
+                NProgress.configure({ showSpinner: true, trickle: false })
+                NProgress.start()
+                let fd = new FormData()
+                fd.append('file', file)
+                fileUpload(fd, {}, props.fileForceLocal, {
+                    onUploadProgress: (evt) => {
+                        NProgress.set(evt.progress!)
+                    },
+                }).then((res) => {
+                    if (res.code == 1) {
+                        insertFn(res.data.file.full_url)
+                    }
+                    NProgress.done()
+                })
+            },
         },
     }
 
