@@ -89,6 +89,49 @@ class Hello extends Frontend
 	}
 
 	/**
+	 * 获取一个帖子或者多个帖子，支持分页
+	 * 支持传入id获取单个帖子，不传id获取多个帖子
+	 * 支持所有的请求方式
+	 * @return void
+	 */
+	public function posts(): void
+	{
+		$faker  = Factory::create('zh_CN');
+		$params = $this->request->get();
+
+		if (isset($params['id'])) {
+			$data = [
+				'id'      => $params['id'],
+				'userId'  => $faker->numberBetween(1, 10),
+				'title'   => $faker->text(20),
+				'content' => $faker->text
+			];
+			$this->success('获得了一个帖子', $data);
+			return;
+		}
+
+		$list  = [];
+		$page  = $params['page'] ?? 1;
+		$limit = $params['limit'] ?? 10;
+
+		for ($i = 0; $i < $limit; $i++) {
+			$list[] = [
+				'id'      => $i + 1,
+				'userId'  => $faker->numberBetween(1, 10),
+				'title'   => $faker->text(20),
+				'content' => $faker->text
+			];
+		}
+		$this->success('获得了10个帖子', [
+			'list'  => $list,
+			'total' => 100,
+			'page'  => $page,
+			'limit' => $limit
+		]);
+
+	}
+
+	/**
 	 * 获取一个用户或者多个用户
 	 * @return void
 	 */
