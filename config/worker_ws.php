@@ -12,7 +12,7 @@ if (!is_dir(dirname($logFile))) {
 
 $register = [
     'ip'   => '127.0.0.1',
-    'port' => '1260',
+    'port' => '1236',
 ];
 
 return [

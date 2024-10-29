@@ -31,8 +31,8 @@
         "ext-iconv": "*",
         "ext-json": "*",
         "ext-gd": "*",
-        "workerman/gateway-worker": "^3.1",
-        "fakerphp/faker": "^1.23"
+        "fakerphp/faker": "^1.23",
+        "workerman/gateway-worker": "^3.1"
     },
     "require-dev": {
         "symfony/var-dumper": "^5.4",

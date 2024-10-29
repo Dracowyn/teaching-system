@@ -40,6 +40,7 @@ class WorkerHttpApp extends App
             'SCRIPT_NAME'     => DIRECTORY_SEPARATOR . pathinfo($scriptFilePath, PATHINFO_BASENAME),
             'DOCUMENT_ROOT'   => dirname($scriptFilePath),
             'PATH_INFO'       => $request->path(),
+            'SERVER_SOFTWARE' => 'WorkerMan Development Server',
         ]);
 
         $headers = $request->header();
