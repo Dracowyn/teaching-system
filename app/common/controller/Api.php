@@ -114,14 +114,8 @@ class Api extends BaseController
             'data' => $data,
         ];
 
-        // 如果未设置类型则自动判断
-        $type = $type ?: ($this->request->param(Config::get('route.var_jsonp_handler')) ? 'jsonp' : $this->responseType);
-
-        $code = 200;
-        if (isset($header['statuscode'])) {
-            $code = $header['statuscode'];
-            unset($header['statuscode']);
-        }
+        $type = $type ?: $this->responseType;
+        $code = $header['statusCode'] ?? 200;
 
         $response = Response::create($result, $type, $code)->header($header)->options($options);
         throw new HttpResponseException($response);

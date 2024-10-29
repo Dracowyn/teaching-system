@@ -483,6 +483,7 @@ const onUpdate = (uid: string, order: number) => {
                 display: -webkit-box;
                 -webkit-box-orient: vertical;
                 -webkit-line-clamp: 2;
+                line-clamp: 2;
                 line-height: 15px;
                 height: 28px;
             }

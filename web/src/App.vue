@@ -6,23 +6,22 @@
 <script setup lang="ts">
 import { onMounted, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import iconfontInit from '/@/utils/iconfont'
 import { useRoute } from 'vue-router'
-import { setTitleFromRoute } from '/@/utils/common'
 import { useConfig } from '/@/stores/config'
-import { useTerminal } from '/@/stores/terminal'
+import { setTitleFromRoute } from '/@/utils/common'
+import iconfontInit from '/@/utils/iconfont'
+import { init as viteInit } from '/@/utils/vite'
 // modules import mark, Please do not remove.
 
-const config = useConfig()
 const route = useRoute()
-const terminal = useTerminal()
+const config = useConfig()
 
 // 初始化 element 的语言包
 const { getLocaleMessage } = useI18n()
 const lang = getLocaleMessage(config.lang.defaultLang) as any
 onMounted(() => {
+    viteInit()
     iconfontInit()
-    terminal.init()
 
     // Modules onMounted mark, Please do not remove.
 })

@@ -8,7 +8,7 @@ import { moduleInstallState, type moduleState } from './types'
 import { uuid } from '/@/utils/random'
 import { fullUrl } from '/@/utils/common'
 import type { UserInfo } from '/@/stores/interface'
-import { closeHotUpdate } from '/@/utils/vite'
+import { closeHotUpdate, changeListenDirtyFileSwitch } from '/@/utils/vite'
 import router from '/@/router/index'
 import { i18n } from '/@/lang/index'
 
@@ -441,8 +441,14 @@ export const execCommand = (data: anyObj) => {
         data.commands.forEach((item: anyObj) => {
             state.common.waitInstallDepend.push(item.type)
             if (item.pm) {
+                if (item.command == 'web-install') {
+                    changeListenDirtyFileSwitch(false)
+                }
                 terminal.addTaskPM(item.command, true, '', (res: number) => {
                     terminalTaskExecComplete(res, item.type)
+                    if (item.command == 'web-install') {
+                        changeListenDirtyFileSwitch(true)
+                    }
                 })
             } else {
                 terminal.addTask(item.command, true, '', (res: number) => {

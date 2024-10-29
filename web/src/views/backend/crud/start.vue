@@ -36,10 +36,10 @@
                         <li>
                             {{ t('crud.crud.experience 2 1') }}
                             <code>{{ t('crud.crud.experience 2 2') }}</code>
-                            {{ t('crud.crud.experience 2 3') }}<code>test_build</code>{{ t('crud.crud.data sheet') }}
+                            {{ t('crud.crud.experience 2 3') }} <code>test_build</code> {{ t('crud.crud.data sheet') }}
                         </li>
                         <li>
-                            {{ t('crud.crud.experience 3 1') }}<code>{{ t('crud.crud.experience 3 2') }}</code>
+                            {{ t('crud.crud.experience 3 1') }} <code>{{ t('crud.crud.experience 3 2') }}</code>
                             {{ t('crud.crud.experience 3 3') }}
                             <code>{{ t('crud.crud.experience 3 4') }}</code>
                         </li>

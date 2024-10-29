@@ -74,4 +74,18 @@ export default {
             'Newly added tasks will never start because they are blocked by failed tasks!(Web terminal)',
         'Failed to modify the source command, Please try again manually': 'Failed to modify the source command. Please try again manually.',
     },
+    vite: {
+        Later: '稍后',
+        'Restart hot update': '重启热更新',
+        'Close type terminal': 'WEB Terminal server',
+        'Close type crud': 'CRUD server',
+        'Close type modules': 'module install server',
+        'Close type config': 'system configuration server',
+        'Reload hot server title': 'Need to restart Vite hot update service',
+        'Reload hot server tips 1': 'To ensure that ',
+        'Reload hot server tips 2':
+            " is not interrupted, the system has temporarily suspended Vite's hot update function. During this period, changes to front-end files will not be updated in real-time and web pages will not be automatically reloaded. It has been detected that there are file updates during the service suspension period, and the hot update service needs to be restarted.",
+        'Reload hot server tips 3':
+            'The pause of hot updates does not affect the already loaded functions. You can continue to operate and click to restart the hot update service after everything is ready.',
+    },
 }

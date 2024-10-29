@@ -182,12 +182,13 @@
 <script setup lang="ts">
 import type { TimelineItemProps } from 'element-plus'
 import { ElMessageBox, ElScrollbar } from 'element-plus'
-import { ref, reactive, nextTick } from 'vue'
+import { nextTick, onMounted, reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { postChangeTerminalConfig } from '/@/api/common'
 import FormItem from '/@/components/formItem/index.vue'
 import { taskStatus } from '/@/stores/constant/terminalTaskStatus'
 import { useTerminal } from '/@/stores/terminal'
+import { changeListenDirtyFileSwitch } from '/@/utils/vite'
 
 type SourceType = 'npm' | 'composer'
 
@@ -236,11 +237,11 @@ const getTaskStatus = (status: number) => {
     }
 }
 
-const addTerminalTask = (command: string, pm: boolean, blockOnFailure = true) => {
+const addTerminalTask = (command: string, pm: boolean, blockOnFailure = true, extend = '', callback: Function = () => {}) => {
     if (pm) {
-        terminal.addTaskPM(command, blockOnFailure)
+        terminal.addTaskPM(command, blockOnFailure, extend, callback)
     } else {
-        terminal.addTask(command, blockOnFailure)
+        terminal.addTask(command, blockOnFailure, extend, callback)
     }
 
     // 任务列表滚动条滚动到底部
@@ -257,7 +258,10 @@ const webBuild = () => {
         cancelButtonText: t('Cancel'),
         type: 'warning',
     }).then(() => {
-        addTerminalTask('web-build', true)
+        changeListenDirtyFileSwitch(false)
+        addTerminalTask('web-build', true, true, '', () => {
+            changeListenDirtyFileSwitch(true)
+        })
     })
 }
 
@@ -313,6 +317,10 @@ const getSourceContent = (type: SourceType) => {
     }
     return content
 }
+
+onMounted(() => {
+    terminal.init()
+})
 </script>
 
 <style scoped lang="scss">
@@ -408,6 +416,9 @@ const getSourceContent = (type: SourceType) => {
 }
 :deep(.main-dialog) {
     --el-dialog-padding-primary: 16px 16px 0 16px;
+    .el-dialog__body {
+        margin-top: 16px;
+    }
 }
 :deep(.ba-terminal-dialog) {
     --el-dialog-width: 46% !important;

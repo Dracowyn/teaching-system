@@ -74,4 +74,17 @@ export default {
         'Newly added tasks will never start because they are blocked by failed tasks': '新添加的任务永远不会开始，因为被失败的任务阻塞！（WEB终端）',
         'Failed to modify the source command, Please try again manually': '修改源的命令执行失败，请手动重试。',
     },
+    vite: {
+        Later: '稍后',
+        'Restart hot update': '重启热更新',
+        'Close type terminal': 'WEB终端执行命令',
+        'Close type crud': 'CRUD代码生成服务',
+        'Close type modules': '模块安装服务',
+        'Close type config': '修改系统配置',
+        'Reload hot server title': '需要重启 Vite 热更新服务',
+        'Reload hot server tips 1': '为确保',
+        'Reload hot server tips 2':
+            '不被打断，系统暂停了 Vite 的热更新功能，期间前端文件变动将不会实时更新和自动重载网页，现检测到服务暂停期间存在文件更新，需要重启热更新服务。',
+        'Reload hot server tips 3': '热更新暂停不影响已经加载好的功能，您可以继续操作，并在一切就绪后再点击重新启动热更新服务。',
+    },
 }

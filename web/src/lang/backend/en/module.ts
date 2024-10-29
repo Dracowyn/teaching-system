@@ -156,4 +156,9 @@ export default {
     'Wait for installation': 'Wait for installation',
     'Conflict pending': 'Conflict pending',
     'Dependency to be installed': 'Dependency to be installed',
+    'Restart Vite hot server': 'Restart Vite hot server',
+    'Restart Vite hot server tips':
+        'Before successfully restarting the service, you can find the button to manually restart the service from the button group on the right side of the top bar.',
+    'Manual restart': 'Manual restart',
+    'Restart Now': 'Restart Now',
 }

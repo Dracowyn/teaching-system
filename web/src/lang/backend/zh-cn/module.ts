@@ -148,4 +148,8 @@ export default {
     'Wait for installation': '等待安装',
     'Conflict pending': '冲突待处理',
     'Dependency to be installed': '依赖待安装',
+    'Restart Vite hot server': '重启热更新服务',
+    'Restart Vite hot server tips': '在完成服务重启之前，您还可以随时从顶栏右侧的按钮组中找到手动重启服务的按钮。',
+    'Manual restart': '手动重启',
+    'Restart Now': '立即重启',
 }
