@@ -7,6 +7,7 @@
 namespace app\api\controller;
 
 use app\common\controller\Frontend;
+use Faker\Factory;
 
 class Hello extends Frontend
 {
@@ -85,5 +86,38 @@ class Hello extends Frontend
 		];
 
 		$this->success('获得了一个详情', $detail);
+	}
+
+	/**
+	 * 获取一个用户或者多个用户
+	 * @return void
+	 */
+	public function users(): void
+	{
+		$faker = Factory::create('zh_CN');
+		$id    = $this->request->get('id');
+		// 获取一个用户详情
+		if ($id) {
+			$user = [
+				'id'   => $id,
+				'name' => $faker->name,
+				'age'  => $faker->numberBetween(18, 60),
+				'info' => $faker->text
+			];
+			$this->success('获得了一个用户详情', $user);
+			return;
+		}
+
+		// 随机生成10个用户
+		$users = [];
+		for ($i = 0; $i < 10; $i++) {
+			$users[] = [
+				'id'   => $i + 1,
+				'name' => $faker->name,
+				'age'  => $faker->numberBetween(18, 60),
+				'info' => $faker->text
+			];
+		}
+		$this->success('获得了10个用户', $users);
 	}
 }
