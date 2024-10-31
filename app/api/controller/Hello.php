@@ -110,19 +110,45 @@ class Hello extends Frontend
 			return;
 		}
 
-		$list  = [];
-		$page  = $params['page'] ?? 1;
-		$limit = $params['limit'] ?? 10;
+		$list   = [];
+		$userId = $params['userId'] ?? 0;
+		$page   = $params['page'] ?? 1;
+		$limit  = $params['limit'] ?? 10;
 
-		for ($i = 0; $i < $limit; $i++) {
-			$list[] = [
-				'id'      => $i + 1,
-				'userId'  => $faker->numberBetween(1, 10),
-				'title'   => $faker->text(20),
-				'content' => $faker->text
-			];
+		// 如果用户id存在，只获取该用户的帖子
+		if ($userId) {
+			for ($i = 0; $i < $limit; $i++) {
+				$list[] = [
+					'id'      => $i + 1,
+					'userId'  => $userId,
+					'title'   => $faker->text(20),
+					'content' => $faker->text
+				];
+			}
+			$this->success('获得了10个帖子', [
+				'list'  => $list,
+				'total' => 100,
+				'page'  => $page,
+				'limit' => $limit
+			]);
+			return;
 		}
-		$this->success('获得了10个帖子', [
+
+		// 从userId 1-10 每个用户随机生成10个帖子
+		for ($i = 0; $i < 10; $i++) {
+			for ($j = 0; $j < $limit; $j++) {
+				$list[] = [
+					'id'      => $j + 1,
+					'userId'  => $i + 1,
+					'title'   => $faker->text(20),
+					'content' => $faker->text
+				];
+			}
+		}
+
+		$length = count($list);
+
+		$this->success('获得了' . $length . '个帖子', [
 			'list'  => $list,
 			'total' => 100,
 			'page'  => $page,
