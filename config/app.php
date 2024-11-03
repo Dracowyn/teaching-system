@@ -27,7 +27,7 @@ return [
     'exception_tmpl'   => app()->getRootPath() . 'app' .  DIRECTORY_SEPARATOR . 'exception_page.php',
 
     // 错误显示信息,非调试模式有效
-    'error_message'    => '该对象不存在',
+    'error_message'    => '系统错误！请稍后再试～',
     // 显示错误信息
     'show_error_msg'   => false,
 ];
