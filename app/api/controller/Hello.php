@@ -197,7 +197,7 @@ class Hello extends Frontend
 	public function images(): void
 	{
 		$faker  = Factory::create('zh_CN');
-		$params = $this->request->get();
+		$params = $this->request->param();
 
 		// 获取一个图片
 		if (isset($params['id'])) {
