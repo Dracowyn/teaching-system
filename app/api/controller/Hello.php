@@ -189,4 +189,47 @@ class Hello extends Frontend
 		}
 		$this->success('获得了10个用户', $users);
 	}
+
+	/**
+	 * 获取一张图片或者多张图片
+	 * @return void
+	 */
+	public function images(): void
+	{
+		$faker  = Factory::create('zh_CN');
+		$params = $this->request->get();
+
+		// 获取一个图片
+		if (isset($params['id'])) {
+			$height = $faker->numberBetween(200, 500);
+			$width  = $faker->numberBetween(200, 500);
+			$image  = 'https://picsum.photos/' . $width . '/' . $height;
+			$data   = [
+				'id'     => $params['id'],
+				'image'  => $image,
+				'width'  => $width,
+				'height' => $height
+			];
+			$this->success('获得了一张图片', $data);
+			return;
+		}
+
+		$limit = $params['limit'] ?? 10;
+
+		$images = [];
+		for ($i = 0; $i < $limit; $i++) {
+			// 随机200到500的宽和高
+			$height   = $faker->numberBetween(200, 500);
+			$width    = $faker->numberBetween(200, 500);
+			$image    = 'https://picsum.photos/' . $width . '/' . $height;
+			$images[] = [
+				'id'     => $faker->uuid,
+				'image'  => $image,
+				'width'  => $width,
+				'height' => $height
+			];
+		}
+
+		$this->success('获得了' . $limit . '张图片', $images);
+	}
 }
