@@ -204,7 +204,7 @@ class Hello extends Frontend
 			$height = $params['height'] ?? $faker->numberBetween(200, 500);
 			$width  = $params['width'] ?? $faker->numberBetween(200, 500);
 			$image  = 'https://picsum.photos/' . $width . '/' . $height;
-			$data   = [
+			$data[] = [
 				'id'     => $params['id'],
 				'image'  => $image,
 				'name'   => $faker->title,
