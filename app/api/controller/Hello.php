@@ -207,6 +207,7 @@ class Hello extends Frontend
 			$data   = [
 				'id'     => $params['id'],
 				'image'  => $image,
+				'name'   => $faker->title,
 				'width'  => $width,
 				'height' => $height
 			];
@@ -219,12 +220,13 @@ class Hello extends Frontend
 		$images = [];
 		for ($i = 0; $i < $limit; $i++) {
 			// 随机200到500的宽和高
-			$height = $params['height'] ?? $faker->numberBetween(200, 500);
-			$width  = $params['width'] ?? $faker->numberBetween(200, 500);
+			$height   = $params['height'] ?? $faker->numberBetween(200, 500);
+			$width    = $params['width'] ?? $faker->numberBetween(200, 500);
 			$image    = 'https://picsum.photos/' . $width . '/' . $height;
 			$images[] = [
 				'id'     => $faker->uuid,
 				'image'  => $image,
+				'name'   => $faker->title,
 				'width'  => $width,
 				'height' => $height
 			];
