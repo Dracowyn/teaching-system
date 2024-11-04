@@ -94,6 +94,7 @@ export default {
     'There are no more works': '没有更多作品了',
     'You need to disable this module before updating Do you want to disable it now?': '更新前需要先禁用该模块，立即禁用？',
     'Disable and update': '禁用并更新',
+    'No module purchase order was found within the expiration date': '没有找到在有效期以内的模块购买订单，是否立即购买当前模块？',
     // installConflict
     'new file': '新文件',
     'Existing files': '已有文件',

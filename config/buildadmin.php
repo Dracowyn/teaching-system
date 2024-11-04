@@ -37,6 +37,8 @@ return [
         // 混淆点长度
         'confuse_length' => 2,
     ],
+    // 代理服务器IP（\think\Request 类将尝试获取这些代理服务器发送过来的真实IP）
+    'proxy_server_ip'       => [],
     // Token 配置
     'token'                 => [
         // 默认驱动方式
@@ -79,6 +81,6 @@ return [
     'cdn_url'               => '',
     // 版本号
     'version'               => 'v2.1.2',
-    // 接口地址
+    // 中心接口地址（用于请求模块市场的数据等用途）
     'api_url'               => 'https://buildadmin.com',
 ];

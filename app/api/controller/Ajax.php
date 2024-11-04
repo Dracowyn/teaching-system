@@ -11,6 +11,8 @@ class Ajax extends Frontend
 {
     protected array $noNeedLogin = ['area', 'buildSuffixSvg'];
 
+    protected array $noNeedPermission = ['upload'];
+
     public function initialize(): void
     {
         parent::initialize();

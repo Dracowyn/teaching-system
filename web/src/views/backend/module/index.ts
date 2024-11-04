@@ -156,7 +156,11 @@ export const showInfo = (uid: string) => {
         })
 }
 
-export const onBuy = () => {
+/**
+ * 支付订单
+ * @param renew 是否是续费订单
+ */
+export const onBuy = (renew = false) => {
     state.dialog.buy = true
     state.loading.buy = true
     createOrder({
@@ -164,6 +168,7 @@ export const onBuy = () => {
     })
         .then((res) => {
             state.loading.buy = false
+            state.buy.renew = renew
             state.buy.info = res.data.info
         })
         .catch((err) => {
@@ -178,11 +183,11 @@ export const onPay = (payType: 'score' | 'wx' | 'balance' | 'zfb') => {
     state.loading.common = true
     payOrder(state.buy.info.id, payType)
         .then((res) => {
-            if (payType == 'wx' || payType == 'zfb') {
-                // 关闭其他弹窗
-                state.dialog.buy = false
-                state.dialog.goodsInfo = false
+            // 关闭其他弹窗
+            state.dialog.buy = false
+            state.dialog.goodsInfo = false
 
+            if (payType == 'wx' || payType == 'zfb') {
                 // 显示支付二维码
                 state.dialog.pay = true
                 state.payInfo = res.data
@@ -193,13 +198,21 @@ export const onPay = (payType: 'score' | 'wx' | 'balance' | 'zfb') => {
                         .then(() => {
                             state.payInfo.pay.status = 'success'
                             clearInterval(timer)
-                            onInstall(res.data.info.uid, res.data.info.id)
+                            if (state.buy.renew) {
+                                showInfo(res.data.info.uid)
+                            } else {
+                                onInstall(res.data.info.uid, res.data.info.id)
+                            }
                             state.dialog.pay = false
                         })
                         .catch(() => {})
                 }, 3000)
             } else {
-                onInstall(res.data.info.uid, res.data.info.id)
+                if (state.buy.renew) {
+                    showInfo(res.data.info.uid)
+                } else {
+                    onInstall(res.data.info.uid, res.data.info.id)
+                }
             }
         })
         .catch((err) => {
@@ -254,6 +267,7 @@ export const execInstall = (uid: string, id: number, extend: anyObj = {}) => {
             state.common.dialogTitle = i18n.global.t('module.Installation complete')
             state.common.moduleState = moduleInstallState.INSTALLED
             state.common.type = 'done'
+            onRefreshTableData()
         })
         .catch((res) => {
             if (loginExpired(res)) return
@@ -293,11 +307,11 @@ export const execInstall = (uid: string, id: number, extend: anyObj = {}) => {
                     zIndex: 9999,
                 })
                 state.dialog.common = false
+                onRefreshTableData()
             }
         })
         .finally(() => {
             state.loading.common = false
-            onRefreshTableData()
         })
 }
 
@@ -308,15 +322,25 @@ const terminalTaskExecComplete = (res: number, type: string) => {
         })
         if (state.common.waitInstallDepend.length == 0) {
             state.common.dependInstallState = 'success'
+
+            // 仅在命令全部执行完毕才刷新数据
+            if (router.currentRoute.value.name === 'moduleStore/moduleStore') {
+                onRefreshTableData()
+            }
         }
     } else {
         const terminal = useTerminal()
         terminal.toggle(true)
         state.common.dependInstallState = 'fail'
+
+        // 有命令执行失败了，刷新一次数据
+        if (router.currentRoute.value.name === 'moduleStore/moduleStore') {
+            onRefreshTableData()
+        }
     }
 
+    // 连续安装模块的情况中，首个模块的命令执行完毕时，自动启动了热更新
     if (router.currentRoute.value.name === 'moduleStore/moduleStore') {
-        onRefreshTableData()
         closeHotUpdate('modules')
     }
 }
@@ -373,7 +397,6 @@ export const onDisable = (confirmConflict = false) => {
                 }
                 state.common.uid = state.goodsInfo.uid
                 execCommand(commandsData)
-                onRefreshTableData()
             } else if (res.code == -3) {
                 // 更新
                 onInstall(state.goodsInfo.uid, state.goodsInfo.purchased)
@@ -383,6 +406,7 @@ export const onDisable = (confirmConflict = false) => {
                     message: res.msg,
                     zIndex: 9999,
                 })
+                onRefreshTableData()
             }
         })
         .finally(() => {

@@ -115,7 +115,7 @@
                                     installButtonState.buy.includes(state.goodsInfo.state) &&
                                     state.goodsInfo.type == 'online'
                                 "
-                                @click="onBuy"
+                                @click="onBuy(false)"
                                 v-blur
                                 class="basic-button-item"
                                 type="danger"
@@ -316,6 +316,21 @@ const unInstall = (uid: string) => {
 }
 
 const onUpdate = (uid: string, order: number) => {
+    // 无有效订单
+    if (!order) {
+        ElMessageBox.confirm(t('module.No module purchase order was found within the expiration date'), t('Reminder'), {
+            confirmButtonText: t('Confirm'),
+            cancelButtonText: t('Cancel'),
+            type: 'warning',
+        })
+            .then(() => {
+                onBuy(true)
+            })
+            .catch(() => {})
+        return
+    }
+
+    // 未登录
     const baAccount = useBaAccount()
     if (!baAccount.token) {
         state.dialog.baAccount = true
