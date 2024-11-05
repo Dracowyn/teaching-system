@@ -207,7 +207,7 @@ class Hello extends Frontend
 			$data[] = [
 				'id'     => $params['id'],
 				'image'  => $image,
-				'name'   => $faker->title,
+				'name'   => $faker->words(2, true),
 				'width'  => $width,
 				'height' => $height
 			];
@@ -226,7 +226,7 @@ class Hello extends Frontend
 			$images[] = [
 				'id'     => $faker->uuid,
 				'image'  => $image,
-				'name'   => $faker->title,
+				'name'   => $faker->words(2, true),
 				'width'  => $width,
 				'height' => $height
 			];
