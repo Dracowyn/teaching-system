@@ -198,8 +198,10 @@ class Hello extends Frontend
 	{
 		$faker  = Factory::create('zh_CN');
 		$params = $this->request->param();
+		$limit  = $params['limit'] ?? 10;
+		$type   = $params['type'] ?? 'all';
+		$images = [];
 
-		// 获取一个图片
 		if (isset($params['id'])) {
 			$height = $params['height'] ?? $faker->numberBetween(200, 500);
 			$width  = $params['width'] ?? $faker->numberBetween(200, 500);
@@ -215,18 +217,22 @@ class Hello extends Frontend
 			return;
 		}
 
-		$limit = $params['limit'] ?? 10;
-
-		$images = [];
 		for ($i = 0; $i < $limit; $i++) {
-			// 随机200到500的宽和高
-			$height   = $params['height'] ?? $faker->numberBetween(200, 500);
-			$width    = $params['width'] ?? $faker->numberBetween(200, 500);
-			$image    = 'https://picsum.photos/' . $width . '/' . $height;
+			$width  = $params['width'] ?? $faker->numberBetween(200, 500);
+			$height = $params['height'] ?? $faker->numberBetween(200, 500);
+			$image  = 'https://picsum.photos/' . $width . '/' . $height;
+
+			if ($type === 'pixiv') {
+				$image = 'https://api.likepoems.com/img/pixiv/';
+			} elseif ($type === 'bing') {
+				$image = 'https://api.likepoems.com/img/bing/';
+			}
+
 			$images[] = [
 				'id'     => $faker->uuid,
 				'image'  => $image,
 				'name'   => $faker->words(2, true),
+				'type'   => $type,
 				'width'  => $width,
 				'height' => $height
 			];
