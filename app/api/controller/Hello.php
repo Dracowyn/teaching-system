@@ -223,9 +223,9 @@ class Hello extends Frontend
 			$image  = 'https://picsum.photos/' . $width . '/' . $height;
 
 			if ($type === 'pixiv') {
-				$image = 'https://api.likepoems.com/img/pixiv/';
+				$image = 'https://api.likepoems.com/img/pixiv/' . '?' . $faker->numberBetween(1, 1000);
 			} elseif ($type === 'bing') {
-				$image = 'https://api.likepoems.com/img/bing/';
+				$image = 'https://api.likepoems.com/img/bing/' . '?' . $faker->numberBetween(1, 1000);
 			}
 
 			$images[] = [
