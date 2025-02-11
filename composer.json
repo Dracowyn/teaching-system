@@ -31,7 +31,8 @@
         "ext-json": "*",
         "ext-gd": "*",
         "fakerphp/faker": "^1.23",
-        "workerman/gateway-worker": "^3.1"
+        "workerman/gateway-worker": "^3.1",
+        "aliyuncs/oss-sdk-php": "^2.6"
     },
     "require-dev": {
         "symfony/var-dumper": "^5.4",
