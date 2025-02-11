@@ -3,6 +3,7 @@
 namespace app\api\controller;
 
 use app\common\controller\Frontend;
+use app\common\model\news\Category;
 use think\db\exception\DataNotFoundException;
 use think\db\exception\DbException;
 use think\db\exception\ModelNotFoundException;
@@ -87,6 +88,31 @@ class News extends Frontend
 			__('Get success'),
 			[
 				'info' => $info
+			]
+		);
+	}
+
+	/**
+	 * 获取新闻分类
+	 */
+	public function category(): void
+	{
+		$categoryModel = new Category();
+
+		$list = $categoryModel
+			->field(['id', 'name'])
+			->select();
+
+		$listData = [];
+		foreach ($list as $key => $value) {
+			$listData[$key]['id']   = $value['id'];
+			$listData[$key]['name'] = $value['name'];
+		}
+
+		$this->success(
+			__('Get success'),
+			[
+				'list' => $listData
 			]
 		);
 	}
