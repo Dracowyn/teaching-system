@@ -16,9 +16,11 @@ class Category extends Backend
      */
     protected object $model;
 
+    protected string|array $defaultSortField = 'weigh,desc';
+
     protected array|string $preExcludeFields = ['id', 'create_time', 'update_time'];
 
-    protected string|array $quickSearchField = ['id'];
+    protected string|array $quickSearchField = ['id', 'name', 'remark'];
 
     public function initialize(): void
     {

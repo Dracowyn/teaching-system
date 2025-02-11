@@ -35,7 +35,7 @@ defineOptions({
 
 const { t } = useI18n()
 const tableRef = ref()
-const optButtons: OptButton[] = defaultOptButtons(['edit', 'delete'])
+const optButtons: OptButton[] = defaultOptButtons(['weigh-sort', 'edit', 'delete'])
 
 /**
  * baTable 内包含了表格的所有数据且数据具备响应性，然后通过 provide 注入给了后代组件
@@ -48,11 +48,13 @@ const baTable = new baTableClass(
             { type: 'selection', align: 'center', operator: false },
             { label: t('news.category.id'), prop: 'id', align: 'center', width: 70, operator: 'RANGE', sortable: 'custom' },
             { label: t('news.category.name'), prop: 'name', align: 'center', operatorPlaceholder: t('Fuzzy query'), operator: 'LIKE', sortable: false },
+            { label: t('news.category.weigh'), prop: 'weigh', align: 'center', operator: 'RANGE', sortable: 'custom' },
             { label: t('news.category.create_time'), prop: 'create_time', align: 'center', render: 'datetime', operator: 'RANGE', sortable: 'custom', width: 160, timeFormat: 'yyyy-mm-dd hh:MM:ss' },
             { label: t('news.category.update_time'), prop: 'update_time', align: 'center', render: 'datetime', operator: 'RANGE', sortable: 'custom', width: 160, timeFormat: 'yyyy-mm-dd hh:MM:ss' },
-            { label: t('Operate'), align: 'center', width: 100, render: 'buttons', buttons: optButtons, operator: false },
+            { label: t('Operate'), align: 'center', width: 140, render: 'buttons', buttons: optButtons, operator: false },
         ],
         dblClickNotEditColumn: [undefined],
+        defaultOrder: { prop: 'weigh', order: 'desc' },
     },
     {
         defaultItems: {},

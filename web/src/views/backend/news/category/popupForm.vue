@@ -31,6 +31,8 @@
                     :rules="rules"
                 >
                     <FormItem :label="t('news.category.name')" type="string" v-model="baTable.form.items!.name" prop="name" :placeholder="t('Please input field', { field: t('news.category.name') })" />
+                    <FormItem :label="t('news.category.remark')" type="textarea" v-model="baTable.form.items!.remark" prop="remark" :input-attr="{ rows: 3 }" @keyup.enter.stop="" @keyup.ctrl.enter="baTable.onSubmit(formRef)" :placeholder="t('Please input field', { field: t('news.category.remark') })" />
+                    <FormItem :label="t('news.category.weigh')" type="number" v-model="baTable.form.items!.weigh" prop="weigh" :input-attr="{ step: 1 }" :placeholder="t('Please input field', { field: t('news.category.weigh') })" />
                 </el-form>
             </div>
         </el-scrollbar>
