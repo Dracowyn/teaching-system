@@ -36,9 +36,9 @@
                 <div
                     v-for="(menu, index) in item.children"
                     :key="index"
-                    @click="routerPush('', menu)"
+                    @click="routerPush(menu)"
                     class="user-menu-item"
-                    :class="memberCenter.state.activeRoute?.name == menu.name ? 'active' : ''"
+                    :class="route.fullPath == menu.path ? 'active' : ''"
                 >
                     <Icon :name="menu.meta?.icon" size="16" color="var(--el-text-color-secondary)" />
                     <span>{{ menu.meta?.title }}</span>
@@ -49,23 +49,21 @@
 </template>
 
 <script setup lang="ts">
-import { useRouter, type RouteRecordRaw } from 'vue-router'
-import { useUserInfo } from '/@/stores/userInfo'
+import { useRoute, useRouter, type RouteRecordRaw } from 'vue-router'
 import { useMemberCenter } from '/@/stores/memberCenter'
-import { onClickMenu } from '/@/utils/router'
+import { useUserInfo } from '/@/stores/userInfo'
 import { fullUrl } from '/@/utils/common'
+import { onClickMenu } from '/@/utils/router'
 
+const route = useRoute()
 const router = useRouter()
 const userInfo = useUserInfo()
 const memberCenter = useMemberCenter()
 
-const routerPush = (routeName = '', route?: RouteRecordRaw) => {
-    if (document.body.clientWidth < 992) {
-        memberCenter.toggleMenuExpand(false)
-    }
-    if (routeName) {
-        router.push({ name: routeName })
-    } else if (route) {
+const routerPush = (route: string | RouteRecordRaw) => {
+    if (typeof route === 'string') {
+        router.push({ name: route })
+    } else {
         onClickMenu(route)
     }
 }

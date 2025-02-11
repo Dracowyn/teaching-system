@@ -1,7 +1,12 @@
 <template>
     <div>
-        <el-tag v-if="cellValue !== ''" :type="getTagType(cellValue, field.custom)" :effect="field.effect ?? 'light'" :size="field.size ?? 'default'">
-            {{ !isEmpty(field.replaceValue) ? field.replaceValue[cellValue] ?? cellValue : cellValue }}
+        <el-tag
+            v-if="![null, undefined, ''].includes(cellValue)"
+            :type="getTagType(cellValue, field.custom)"
+            :effect="field.effect ?? 'light'"
+            :size="field.size ?? 'default'"
+        >
+            {{ !isEmpty(field.replaceValue) ? (field.replaceValue[cellValue] ?? cellValue) : cellValue }}
         </el-tag>
     </div>
 </template>

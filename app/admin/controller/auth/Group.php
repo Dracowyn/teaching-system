@@ -132,12 +132,12 @@ class Group extends Backend
 
     /**
      * 编辑
-     * @param string|null $id
-     * @return void
      * @throws Throwable
      */
-    public function edit(string $id = null): void
+    public function edit(): void
     {
+        $pk  = $this->model->getPk();
+        $id  = $this->request->param($pk);
         $row = $this->model->find($id);
         if (!$row) {
             $this->error(__('Record not found'));
@@ -187,7 +187,8 @@ class Group extends Backend
         $pidArr = AdminRule::field('pid')
             ->distinct(true)
             ->where('id', 'in', $row->rules)
-            ->select()->toArray();
+            ->select()
+            ->toArray();
         $rules  = $row->rules ? explode(',', $row->rules) : [];
         foreach ($pidArr as $item) {
             $ruKey = array_search($item['pid'], $rules);
@@ -203,17 +204,12 @@ class Group extends Backend
 
     /**
      * 删除
-     * @param array $ids
      * @throws Throwable
      */
-    public function del(array $ids = []): void
+    public function del(): void
     {
-        if (!$this->request->isDelete() || !$ids) {
-            $this->error(__('Parameter error'));
-        }
-
-        $pk   = $this->model->getPk();
-        $data = $this->model->where($pk, 'in', $ids)->select();
+        $ids  = $this->request->param('ids/a', []);
+        $data = $this->model->where($this->model->getPk(), 'in', $ids)->select();
         foreach ($data as $v) {
             $this->checkAuth($v->id);
         }
@@ -266,7 +262,7 @@ class Group extends Backend
      * 权限节点入库前处理
      * @throws Throwable
      */
-    public function handleRules(array &$data): array
+    private function handleRules(array &$data): array
     {
         if (!empty($data['rules']) && is_array($data['rules'])) {
             $rules      = AdminRule::select();
@@ -298,7 +294,7 @@ class Group extends Backend
      * @return array
      * @throws Throwable
      */
-    public function getGroups(array $where = []): array
+    private function getGroups(array $where = []): array
     {
         $pk      = $this->model->getPk();
         $initKey = $this->request->get("initKey/s", $pk);
@@ -352,7 +348,7 @@ class Group extends Backend
      * @return void
      * @throws Throwable
      */
-    public function checkAuth($groupId): void
+    private function checkAuth($groupId): void
     {
         $authGroups = $this->auth->getAllAuthGroups($this->authMethod);
         if (!$this->auth->isSuperAdmin() && !in_array($groupId, $authGroups)) {

@@ -172,13 +172,16 @@ const eventNameMap = {
 const onElChange = (file: UploadFileExt, files: UploadFiles) => {
     // 将 file 换为 files 中的对象，以便修改属性等操作
     const fileIndex = getArrayKey(files, 'uid', file.uid!)
-    if (!fileIndex) return
+    if (fileIndex === false) return
+
     file = files[fileIndex] as UploadFileExt
     if (!file || !file.raw) return
     if (triggerEvent('beforeUpload', [file]) === false) return
     let fd = new FormData()
     fd.append('file', file.raw)
     fd = formDataAppend(fd)
+
+    file.status = 'uploading'
     state.uploading++
     fileUpload(fd, { uuid: uuid() }, props.forceLocal, {
         onUploadProgress: (evt: AxiosProgressEvent) => {
@@ -217,7 +220,9 @@ const onElChange = (file: UploadFileExt, files: UploadFiles) => {
 const onElRemove = (file: UploadUserFile, files: UploadFiles) => {
     triggerEvent('remove', [file, files])
     onChange(file, files)
-    emits('update:modelValue', getAllUrls())
+    nextTick(() => {
+        emits('update:modelValue', getAllUrls())
+    })
 }
 
 const onElPreview = (file: UploadFileExt) => {

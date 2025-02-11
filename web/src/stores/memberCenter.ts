@@ -1,13 +1,12 @@
 import { defineStore } from 'pinia'
 import { reactive } from 'vue'
-import type { RouteLocationNormalized, RouteRecordRaw } from 'vue-router'
+import type { RouteRecordRaw } from 'vue-router'
 import type { MemberCenter } from '/@/stores/interface/index'
 
 export const useMemberCenter = defineStore('memberCenter', () => {
     const state: MemberCenter = reactive({
-        open: false,
+        open: true,
         layoutMode: 'Default',
-        activeRoute: null,
         viewRoutes: [],
         showHeadline: false,
         authNode: new Map(),
@@ -40,10 +39,6 @@ export const useMemberCenter = defineStore('memberCenter', () => {
         state.showHeadline = show
     }
 
-    const setActiveRoute = (route: RouteLocationNormalized | RouteRecordRaw) => {
-        state.activeRoute = route
-    }
-
     const setShrink = (shrink: boolean) => {
         state.shrink = shrink
     }
@@ -68,7 +63,6 @@ export const useMemberCenter = defineStore('memberCenter', () => {
         mergeAuthNode,
         setViewRoutes,
         setShowHeadline,
-        setActiveRoute,
         setShrink,
         setStatus,
         setLayoutMode,

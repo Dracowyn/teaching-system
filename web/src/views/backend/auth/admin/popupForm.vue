@@ -75,6 +75,7 @@
                         prop="password"
                         v-model="baTable.form.items!.password"
                         type="password"
+                        :input-attr="{ autocomplete: 'new-password' }"
                         :placeholder="
                             baTable.form.operate == 'Add'
                                 ? t('Please input field', { field: t('auth.admin.Password') })

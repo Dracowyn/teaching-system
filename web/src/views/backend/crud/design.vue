@@ -297,7 +297,7 @@
                                     <FormItem
                                         :label="t('crud.crud.length')"
                                         type="number"
-                                        v-model.number="state.fields[state.activateField].length"
+                                        v-model="state.fields[state.activateField].length"
                                         :input-attr="{
                                             onChange: onFieldAttrChange,
                                         }"
@@ -305,7 +305,7 @@
                                     <FormItem
                                         :label="t('crud.crud.decimal point')"
                                         type="number"
-                                        v-model.number="state.fields[state.activateField].precision"
+                                        v-model="state.fields[state.activateField].precision"
                                         :input-attr="{
                                             onChange: onFieldAttrChange,
                                         }"
@@ -387,6 +387,7 @@
                                 <el-divider content-position="left">{{ t('crud.crud.Field Form Properties') }}</el-divider>
                                 <template v-for="(item, idx) in state.fields[state.activateField].form" :key="idx">
                                     <FormItem
+                                        v-if="item.type != 'hidden'"
                                         :label="$t('crud.crud.' + idx)"
                                         :type="item.type"
                                         v-model="state.fields[state.activateField].form[idx].value"
@@ -486,6 +487,19 @@
                                 }"
                             />
                             <FormItem
+                                :label="t('crud.crud.Data source configuration type')"
+                                v-model="state.remoteSelectPre.form.sourceConfigType"
+                                type="radio"
+                                :input-attr="{
+                                    border: true,
+                                    content: {
+                                        crud: t('crud.crud.Fast configuration with generated controllers and models'),
+                                        custom: t('crud.crud.Custom configuration'),
+                                    },
+                                }"
+                            />
+                            <FormItem
+                                v-if="state.remoteSelectPre.form.sourceConfigType == 'crud'"
                                 prop="controllerFile"
                                 type="select"
                                 :label="t('crud.crud.Controller position')"
@@ -501,7 +515,10 @@
                                     )
                                 "
                             />
+
+                            <!-- 数据源配置类型为CRUD时，模型位置必填 -->
                             <FormItem
+                                :prop="state.remoteSelectPre.form.sourceConfigType == 'crud' ? 'modelFile' : ''"
                                 type="select"
                                 :label="t('crud.crud.Data Model Location')"
                                 v-model="state.remoteSelectPre.form.modelFile"
@@ -511,9 +528,11 @@
                                     content: state.remoteSelectPre.modelFileList,
                                 }"
                                 :block-help="
-                                    t(
-                                        'crud.crud.If it is left blank, the model of the associated table will be generated automatically If the table already has a model, it is recommended to select it to avoid repeated generation'
-                                    )
+                                    state.remoteSelectPre.form.sourceConfigType == 'crud'
+                                        ? ''
+                                        : t(
+                                              'crud.crud.If it is left blank, the model of the associated table will be generated automatically If the table already has a model, it is recommended to select it to avoid repeated generation'
+                                          )
                                 "
                             />
                             <el-form-item
@@ -526,6 +545,27 @@
                                     <div>{{ t('crud.crud.There is no connection attribute in model class') }}</div>
                                 </div>
                             </el-form-item>
+                            <FormItem
+                                v-if="state.remoteSelectPre.form.sourceConfigType == 'custom'"
+                                prop="remoteUrl"
+                                :label="t('crud.crud.api url')"
+                                type="string"
+                                v-model="state.remoteSelectPre.form.remoteUrl"
+                                :placeholder="t('crud.crud.api url example')"
+                            />
+                            <FormItem
+                                v-if="state.remoteSelectPre.form.sourceConfigType == 'custom'"
+                                :label="t('crud.crud.remote-primary-table-alias')"
+                                type="string"
+                                v-model="state.remoteSelectPre.form.primaryTableAlias"
+                                :block-help="
+                                    t(
+                                        'crud.crud.If the remote interface query involves associated query of multiple tables, enter the alias of the primary data table here'
+                                    )
+                                "
+                            >
+                                <template #append>.{{ state.remoteSelectPre.form.pk }}</template>
+                            </FormItem>
                             <el-form-item :label="t('Reminder')">
                                 <div class="block-help">
                                     {{ t('crud.crud.Design remote select tips') }}
@@ -557,7 +597,6 @@
                     center
                     type="error"
                 />
-                <br />
                 <el-alert
                     v-if="showTableConflictConfirmGenerate()"
                     :title="
@@ -565,6 +604,18 @@
                             'crud.crud.The data table already exists Continuing to generate will automatically delete the original table and create a new one!'
                         )
                     "
+                    class="mt-10"
+                    center
+                    type="error"
+                />
+                <el-alert
+                    v-if="state.confirmGenerate.menu"
+                    :title="
+                        t(
+                            'crud.crud.The menu rule with the same name already exists The menu and permission node will not be created in this generation'
+                        )
+                    "
+                    class="mt-10"
                     center
                     type="error"
                 />
@@ -689,13 +740,17 @@ const state: {
             pk: string
             label: string
             joinField: string[]
+            sourceConfigType: 'crud' | 'custom'
+            remoteUrl: string
             modelFile: string
             controllerFile: string
+            primaryTableAlias: string
         }
     }
     showHeaderSeniorConfig: boolean
     confirmGenerate: {
         show: boolean
+        menu: boolean
         table: boolean
         controller: boolean
     }
@@ -746,13 +801,17 @@ const state: {
             pk: '',
             label: '',
             joinField: [],
+            sourceConfigType: 'crud',
+            remoteUrl: '',
             modelFile: '',
             controllerFile: '',
+            primaryTableAlias: '',
         },
     },
     showHeaderSeniorConfig: false,
     confirmGenerate: {
         show: false,
+        menu: false,
         table: false,
         controller: false,
     },
@@ -776,7 +835,7 @@ const onFieldDesignTypeChange = (designType: string) => {
     let fieldDesignData: FieldItem | null = null
     for (const key in fieldItem) {
         const fieldItemIndex = getArrayKey(fieldItem[key as keyof typeof fieldItem], 'designType', designType)
-        if (fieldItemIndex) {
+        if (fieldItemIndex !== false) {
             fieldDesignData = cloneDeep(fieldItem[key as keyof typeof fieldItem][fieldItemIndex])
             break
         }
@@ -853,6 +912,16 @@ const onFieldDesignTypeChange = (designType: string) => {
  * 字段名修改
  */
 const onFieldNameChange = (val: string, index: number) => {
+    const nameRepeatKey = getArrayKey(state.fields, 'name', val)
+    if (nameRepeatKey !== false) {
+        // 重命名失败，字段名称重复
+        state.error.fieldNameDuplication = ElMessage({
+            message: t('crud.crud.Rename failed') + '：' + t('crud.crud.Field name duplication', { field: val }),
+            type: 'error',
+        })
+        return
+    }
+
     const oldName = state.fields[index].name
     state.fields[index].name = val
     for (const key in tableFieldsKey) {
@@ -899,7 +968,7 @@ const primaryKeyRepeatCheck = (field: FieldItem, excludeIndex: number = -1) => {
 }
 
 /**
- * 字段名称命名规则检测
+ * 全部字段的名称命名规则检测
  */
 const fieldNameCheck = (showErrorType: 'ElNotification' | 'ElMessage') => {
     if (state.error.fieldName) {
@@ -931,7 +1000,7 @@ const fieldNameCheck = (showErrorType: 'ElNotification' | 'ElMessage') => {
 }
 
 /**
- * 字段名称重复检测
+ * 全部字段的名称重复检测
  */
 const fieldNameDuplicationCheck = (showErrorType: 'ElNotification' | 'ElMessage') => {
     if (state.error.fieldNameDuplication) {
@@ -1022,6 +1091,9 @@ const showRemoteSelectPre = (index: number, hideDelField = false) => {
         state.remoteSelectPre.form.label = state.fields[index].form['remote-field'].value
         state.remoteSelectPre.form.controllerFile = state.fields[index].form['remote-controller'].value
         state.remoteSelectPre.form.modelFile = state.fields[index].form['remote-model'].value
+        state.remoteSelectPre.form.remoteUrl = state.fields[index].form['remote-url'].value
+        state.remoteSelectPre.form.sourceConfigType = state.fields[index].form['remote-source-config-type'].value
+        state.remoteSelectPre.form.primaryTableAlias = state.fields[index].form['remote-primary-table-alias'].value
         state.remoteSelectPre.form.joinField = state.fields[index].form['relation-fields'].value.split(',')
         getTableFieldList(state.fields[index].form['remote-table'].value, true, state.table.databaseConnection).then((res) => {
             const fieldSelect: anyObj = {}
@@ -1115,6 +1187,7 @@ const onGenerate = () => {
     generateCheck({
         table: state.table.name,
         connection: state.table.databaseConnection,
+        webViewsDir: state.table.webViewsDir,
         controllerFile: state.table.controllerFile,
     })
         .then(() => {
@@ -1123,9 +1196,10 @@ const onGenerate = () => {
         .catch((res) => {
             state.loading.generate = false
             if (res.code == -1) {
+                state.confirmGenerate.menu = res.data.menu
                 state.confirmGenerate.table = res.data.table
                 state.confirmGenerate.controller = res.data.controller
-                if (showTableConflictConfirmGenerate() || state.confirmGenerate.controller) {
+                if (showTableConflictConfirmGenerate() || state.confirmGenerate.controller || state.confirmGenerate.menu) {
                     state.confirmGenerate.show = true
                 } else {
                     startGenerate()
@@ -1293,6 +1367,20 @@ const loadData = () => {
         })
 }
 
+/**
+ * 字段名称重复时自动重命名
+ */
+const autoRenameRepeatField = (fieldName: string) => {
+    const nameRepeatKey = getArrayKey(state.fields, 'name', fieldName)
+    if (nameRepeatKey !== false) {
+        fieldName += nameRepeatCount
+        nameRepeatCount++
+        return autoRenameRepeatField(fieldName)
+    } else {
+        return fieldName
+    }
+}
+
 onMounted(() => {
     loadData()
     const sortable = Sortable.create(designWindowRef.value, {
@@ -1321,13 +1409,10 @@ onMounted(() => {
                     state.table.defaultSortField = data.name
                 }
 
-                // name 重复字段自动重命名
-                const nameRepeatKey = getArrayKey(state.fields, 'name', data.name)
-                if (nameRepeatKey) {
-                    data.name = data.name + nameRepeatCount
-                    nameRepeatCount++
-                }
+                // name 重复时，自动重命名
+                data.name = autoRenameRepeatField(data.name)
 
+                // 插入字段
                 state.fields.splice(evt.newIndex!, 0, data)
 
                 logTableDesignChange({
@@ -1493,6 +1578,9 @@ const onSaveRemoteSelect = () => {
         state.fields[state.remoteSelectPre.index].form['remote-field'].value = state.remoteSelectPre.form.label
         state.fields[state.remoteSelectPre.index].form['remote-controller'].value = state.remoteSelectPre.form.controllerFile
         state.fields[state.remoteSelectPre.index].form['remote-model'].value = state.remoteSelectPre.form.modelFile
+        state.fields[state.remoteSelectPre.index].form['remote-url'].value = state.remoteSelectPre.form.remoteUrl
+        state.fields[state.remoteSelectPre.index].form['remote-source-config-type'].value = state.remoteSelectPre.form.sourceConfigType
+        state.fields[state.remoteSelectPre.index].form['remote-primary-table-alias'].value = state.remoteSelectPre.form.primaryTableAlias
 
         state.fields[state.remoteSelectPre.index].form['relation-fields'].value =
             state.fields[state.remoteSelectPre.index].designType == 'remoteSelect'
@@ -1526,6 +1614,8 @@ const resetRemoteSelectForm = (excludes: string[] = []) => {
         if (excludes.includes(key)) continue
         if (key == 'joinField') {
             state.remoteSelectPre.form[key] = []
+        } else if (key == 'sourceConfigType') {
+            state.remoteSelectPre.form[key] = 'crud'
         } else {
             ;(state.remoteSelectPre.form[key as keyof typeof state.remoteSelectPre.form] as string) = ''
         }
@@ -1538,6 +1628,8 @@ const remoteSelectPreFormRules: Partial<Record<string, FormItemRule[]>> = reacti
     label: [buildValidatorData({ name: 'required', title: t('crud.crud.Drop down label field') })],
     joinField: [buildValidatorData({ name: 'required', title: t('crud.crud.Fields displayed in the table') })],
     controllerFile: [buildValidatorData({ name: 'required', title: t('crud.crud.Controller position') })],
+    modelFile: [buildValidatorData({ name: 'required', title: t('crud.crud.Data Model Location') })],
+    remoteUrl: [buildValidatorData({ name: 'required', title: t('crud.crud.remote-url') })],
 })
 
 const logTableDesignChange = (data: TableDesignChange) => {
@@ -1700,6 +1792,9 @@ const getTableDesignTimelineType = (type: TableDesignChangeType): TimelineItemPr
 }
 .default-main {
     margin-bottom: 0;
+}
+.mt-10 {
+    margin-top: 10px;
 }
 .mr-20 {
     margin-right: 20px;

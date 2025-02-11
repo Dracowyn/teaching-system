@@ -204,10 +204,11 @@ export function getSelectData(remoteUrl: string, q: string, params: anyObj = {})
     return createAxios({
         url: remoteUrl,
         method: 'get',
-        params: Object.assign(params, {
+        params: {
             select: true,
             quickSearch: q,
-        }),
+            ...params,
+        },
     })
 }
 
@@ -344,14 +345,11 @@ export class baTableApi {
         )
     }
 
-    sortableApi(id: number, targetId: number) {
+    sortable(data: anyObj) {
         return createAxios({
             url: this.actionUrl.get('sortable'),
             method: 'post',
-            data: {
-                id: id,
-                targetId: targetId,
-            },
+            data: data,
         })
     }
 }

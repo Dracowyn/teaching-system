@@ -102,11 +102,12 @@ class User extends Backend
 
     /**
      * 编辑
-     * @param string|int|null $id
      * @throws Throwable
      */
-    public function edit(string|int $id = null): void
+    public function edit(): void
     {
+        $pk  = $this->model->getPk();
+        $id  = $this->request->param($pk);
         $row = $this->model->find($id);
         if (!$row) {
             $this->error(__('Record not found'));

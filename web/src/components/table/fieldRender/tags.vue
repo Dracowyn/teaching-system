@@ -3,24 +3,24 @@
         <template v-if="isArray(cellValue)">
             <template v-for="(tag, idx) in cellValue" :key="idx">
                 <el-tag
-                    v-if="tag !== ''"
+                    v-if="![null, undefined, ''].includes(tag)"
                     class="m-4"
                     :type="getTagType(tag, field.custom)"
                     :effect="field.effect ?? 'light'"
                     :size="field.size ?? 'default'"
                 >
-                    {{ !isEmpty(field.replaceValue) ? field.replaceValue[tag] ?? tag : tag }}
+                    {{ !isEmpty(field.replaceValue) ? (field.replaceValue[tag] ?? tag) : tag }}
                 </el-tag>
             </template>
         </template>
         <template v-else>
             <el-tag
-                v-if="cellValue !== ''"
+                v-if="![null, undefined, ''].includes(cellValue)"
                 :type="getTagType(cellValue, field.custom)"
                 :effect="field.effect ?? 'light'"
                 :size="field.size ?? 'default'"
             >
-                {{ !isEmpty(field.replaceValue) ? field.replaceValue[cellValue] ?? cellValue : cellValue }}
+                {{ !isEmpty(field.replaceValue) ? (field.replaceValue[cellValue] ?? cellValue) : cellValue }}
             </el-tag>
         </template>
     </div>

@@ -1,6 +1,6 @@
 import type { FormInstance, TableColumnCtx } from 'element-plus'
 import { ElNotification, dayjs } from 'element-plus'
-import { cloneDeep, isEmpty } from 'lodash-es'
+import { cloneDeep, isArray, isEmpty } from 'lodash-es'
 import Sortable from 'sortablejs'
 import { reactive } from 'vue'
 import { useRoute } from 'vue-router'
@@ -190,10 +190,6 @@ export default class baTable {
         const operate = this.form.operate!.replace(this.form.operate![0], this.form.operate![0].toLowerCase())
 
         if (this.runBefore('onSubmit', { formEl: formEl, operate: operate, items: this.form.items! }) === false) return
-
-        Object.keys(this.form.items!).forEach((item) => {
-            if (this.form.items![item] === null) delete this.form.items![item]
-        })
 
         // 表单验证通过后执行的api请求操作
         const submitCallback = () => {
@@ -429,10 +425,15 @@ export default class baTable {
             },
             onEnd: (evt: Sortable.SortableEvent) => {
                 this.table.column[buttonsKey].buttons![moveButton].disabledTip = disabledTip
+
+                // 目标位置不变
+                if (evt.oldIndex == evt.newIndex || typeof evt.newIndex == 'undefined' || typeof evt.oldIndex == 'undefined') return
+
                 // 找到对应行id
-                const moveRow = findIndexRow(this.table.data!, evt.oldIndex!) as TableRow
-                const replaceRow = findIndexRow(this.table.data!, evt.newIndex!) as TableRow
-                if (this.table.dragSortLimitField && moveRow[this.table.dragSortLimitField] != replaceRow[this.table.dragSortLimitField]) {
+                const moveRow = findIndexRow(this.table.data!, evt.oldIndex) as TableRow
+                const targetRow = findIndexRow(this.table.data!, evt.newIndex) as TableRow
+
+                if (this.table.dragSortLimitField && moveRow[this.table.dragSortLimitField] != targetRow[this.table.dragSortLimitField]) {
                     this.onTableHeaderAction('refresh', {})
                     ElNotification({
                         type: 'error',
@@ -441,9 +442,16 @@ export default class baTable {
                     return
                 }
 
-                this.api.sortableApi(moveRow[this.table.pk!], replaceRow[this.table.pk!]).finally(() => {
-                    this.onTableHeaderAction('refresh', {})
-                })
+                this.api
+                    .sortable({
+                        move: moveRow[this.table.pk!],
+                        target: targetRow[this.table.pk!],
+                        order: this.table.filter?.order,
+                        direction: evt.newIndex > evt.oldIndex ? 'down' : 'up',
+                    })
+                    .finally(() => {
+                        this.onTableHeaderAction('refresh', {})
+                    })
             },
         })
     }
@@ -590,14 +598,15 @@ export default class baTable {
                 val = this.comSearch.form[key]
             }
 
-            if (val !== null) {
-                comSearchData.push({
-                    field: key,
-                    val: val,
-                    operator: fieldDataTemp.operator,
-                    render: fieldDataTemp.render,
-                })
-            }
+            if (val === null) continue
+            if (isArray(val) && !val.length) continue
+
+            comSearchData.push({
+                field: key,
+                val: val,
+                operator: fieldDataTemp.operator,
+                render: fieldDataTemp.render,
+            })
         }
 
         return comSearchData

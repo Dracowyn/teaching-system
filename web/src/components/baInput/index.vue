@@ -1,5 +1,5 @@
 <script lang="ts">
-import { isArray } from 'lodash-es'
+import { isArray, isString } from 'lodash-es'
 import type { PropType, VNode } from 'vue'
 import { computed, createVNode, defineComponent, reactive, resolveComponent } from 'vue'
 import { getArea } from '/@/api/common'
@@ -50,8 +50,8 @@ export default defineComponent({
             emit('update:modelValue', value)
         }
 
-        // string number textarea password
-        const sntp = () => {
+        // 基础用法 string textarea password
+        const bases = () => {
             return () =>
                 createVNode(
                     resolveComponent('el-input'),
@@ -231,10 +231,26 @@ export default defineComponent({
         }
 
         const buildFun = new Map([
-            ['string', sntp],
-            ['number', sntp],
-            ['textarea', sntp],
-            ['password', sntp],
+            ['string', bases],
+            [
+                'number',
+                () => {
+                    return () =>
+                        createVNode(
+                            resolveComponent('el-input-number'),
+                            {
+                                class: 'w100',
+                                'controls-position': 'right',
+                                ...attrs.value,
+                                modelValue: isString(props.modelValue) ? Number(props.modelValue) : props.modelValue,
+                                'onUpdate:modelValue': onValueUpdate,
+                            },
+                            slots
+                        )
+                },
+            ],
+            ['textarea', bases],
+            ['password', bases],
             ['radio', rc],
             ['checkbox', rc],
             [
@@ -304,16 +320,6 @@ export default defineComponent({
             [
                 'time',
                 () => {
-                    const valueComputed = computed(() => {
-                        if (props.modelValue instanceof Date) {
-                            return props.modelValue
-                        } else if (!props.modelValue) {
-                            return ''
-                        } else {
-                            let date = new Date()
-                            return new Date(date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate() + ' ' + props.modelValue)
-                        }
-                    })
                     return () =>
                         createVNode(
                             resolveComponent('el-time-picker'),
@@ -321,8 +327,9 @@ export default defineComponent({
                                 class: 'w100',
                                 clearable: true,
                                 format: 'HH:mm:ss',
+                                valueFormat: 'HH:mm:ss',
                                 ...attrs.value,
-                                modelValue: valueComputed.value,
+                                modelValue: props.modelValue,
                                 'onUpdate:modelValue': onValueUpdate,
                             },
                             slots
@@ -389,6 +396,8 @@ export default defineComponent({
                                 'onUpdate:modelValue': onValueUpdate,
                                 class: 'w100',
                                 clearable: true,
+                                // city 数据使用 varchar 存储，所以清空时使用 empty string 而不是 null
+                                valueOnClear: '',
                                 props: {
                                     lazy: true,
                                     lazyLoad(node: any, resolve: any) {
@@ -464,7 +473,10 @@ export default defineComponent({
                             resolveComponent('el-color-picker'),
                             {
                                 modelValue: props.modelValue,
-                                'onUpdate:modelValue': onValueUpdate,
+                                'onUpdate:modelValue': (newValue: string | null) => {
+                                    // color 数据使用 varchar 存储，点击清空时的 null 值使用 empty string 代替
+                                    emit('update:modelValue', newValue === null ? '' : newValue)
+                                },
                                 ...attrs.value,
                             },
                             slots

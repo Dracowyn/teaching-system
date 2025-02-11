@@ -273,7 +273,7 @@ const updateValue = () => {
         tip: form.tip.value ?? '',
         rule: form.rule.value ?? [],
         extend: form.extend.value ?? '',
-        dict: dictExistsType.includes(form.type.value ?? '') ? form.dict.value ?? '' : '',
+        dict: dictExistsType.includes(form.type.value ?? '') ? (form.dict.value ?? '') : '',
         inputExtend: form.inputExtend.value ?? '',
     })
 }
