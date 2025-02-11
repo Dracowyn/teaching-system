@@ -80,14 +80,29 @@ class News extends Frontend
 	{
 		$param     = $this->request->param(['id']);
 		$newsModel = new \app\common\model\news\News();
-		$info      = $newsModel
-			->field(['id', 'title', 'author', 'content'])
+
+		$info = $newsModel
+			->field(['id', 'title', 'author', 'content', 'category', 'create_time'])
 			->where('id', $param['id'])
 			->find();
+
+		if (!$info) {
+			$this->error(__('Not found news'));
+		}
+
+		$infoData                  = [];
+		$infoData['id']            = $info['id'];
+		$infoData['title']         = $info['title'];
+		$infoData['author']        = $info['author'];
+		$infoData['content']       = $info['content'];
+		$infoData['category_id']   = $info['category'][0];
+		$infoData['category_name'] = $info['categoryTable']['name'][0];
+		$infoData['post_time']     = $info['create_time'];
+
 		$this->success(
 			__('Get success'),
 			[
-				'info' => $info
+				$infoData
 			]
 		);
 	}
