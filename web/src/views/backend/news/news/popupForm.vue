@@ -34,8 +34,8 @@
                     <FormItem :label="t('news.news.anthor')" type="string" v-model="baTable.form.items!.anthor" prop="anthor" :placeholder="t('Please input field', { field: t('news.news.anthor') })" />
                     <FormItem :label="t('news.news.cover')" type="image" v-model="baTable.form.items!.cover" prop="cover" />
                     <FormItem :label="t('news.news.content')" type="editor" v-model="baTable.form.items!.content" prop="content" @keyup.enter.stop="" @keyup.ctrl.enter="baTable.onSubmit(formRef)" :placeholder="t('Please input field', { field: t('news.news.content') })" />
-                    <FormItem :label="t('news.news.hits')" type="number" prop="hits" :input-attr="{ step: 1 }" v-model.number="baTable.form.items!.hits" :placeholder="t('Please input field', { field: t('news.news.hits') })" />
-                    <FormItem :label="t('news.news.category')" type="select" v-model="baTable.form.items!.category" prop="category" :input-attr="{ content: { opt0: t('news.news.category opt0'), opt1: t('news.news.category opt1') } }" :placeholder="t('Please select field', { field: t('news.news.category') })" />
+                    <FormItem :label="t('news.news.hits')" type="number" v-model="baTable.form.items!.hits" prop="hits" :input-attr="{ step: 1 }" :placeholder="t('Please input field', { field: t('news.news.hits') })" />
+                    <FormItem :label="t('news.news.category')" type="remoteSelect" v-model="baTable.form.items!.category" prop="category" :input-attr="{ pk: 'category.id', field: 'name', remoteUrl: '/admin/news.Category/index' }" :placeholder="t('Please select field', { field: t('news.news.category') })" />
                 </el-form>
             </div>
         </el-scrollbar>

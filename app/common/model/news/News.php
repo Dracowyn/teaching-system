@@ -20,4 +20,9 @@ class News extends Model
     {
         return !$value ? '' : htmlspecialchars_decode($value);
     }
+
+    public function categoryTable(): \think\model\relation\BelongsTo
+    {
+        return $this->belongsTo(\app\common\model\news\Category::class, 'category', 'id');
+    }
 }

@@ -50,7 +50,7 @@ const baTable = new baTableClass(
             { label: t('news.news.title'), prop: 'title', align: 'center', operatorPlaceholder: t('Fuzzy query'), operator: 'LIKE', sortable: false },
             { label: t('news.news.anthor'), prop: 'anthor', align: 'center', operatorPlaceholder: t('Fuzzy query'), operator: 'LIKE', sortable: false },
             { label: t('news.news.hits'), prop: 'hits', align: 'center', operator: 'RANGE', sortable: false },
-            { label: t('news.news.category'), prop: 'category', align: 'center', render: 'tag', operator: 'eq', sortable: false, replaceValue: { opt0: t('news.news.category opt0'), opt1: t('news.news.category opt1') } },
+            { label: t('news.news.categorytable__name'), prop: 'categoryTable.name', align: 'center', operatorPlaceholder: t('Fuzzy query'), render: 'tags', operator: 'LIKE' },
             { label: t('news.news.create_time'), prop: 'create_time', align: 'center', render: 'datetime', operator: 'RANGE', sortable: 'custom', width: 160, timeFormat: 'yyyy-mm-dd hh:MM:ss' },
             { label: t('news.news.update_time'), prop: 'update_time', align: 'center', render: 'datetime', operator: 'RANGE', sortable: 'custom', width: 160, timeFormat: 'yyyy-mm-dd hh:MM:ss' },
             { label: t('Operate'), align: 'center', width: 100, render: 'buttons', buttons: optButtons, operator: false },
@@ -58,7 +58,7 @@ const baTable = new baTableClass(
         dblClickNotEditColumn: [undefined],
     },
     {
-        defaultItems: { content: '', category: 'opt0' },
+        defaultItems: { content: '' },
     }
 )
 
