@@ -31,11 +31,11 @@
                     :rules="rules"
                 >
                     <FormItem :label="t('news.news.title')" type="string" v-model="baTable.form.items!.title" prop="title" :placeholder="t('Please input field', { field: t('news.news.title') })" />
-                    <FormItem :label="t('news.news.anthor')" type="string" v-model="baTable.form.items!.anthor" prop="anthor" :placeholder="t('Please input field', { field: t('news.news.anthor') })" />
+                    <FormItem :label="t('news.news.author')" type="string" v-model="baTable.form.items!.author" prop="author" :placeholder="t('Please input field', { field: t('news.news.author') })" />
                     <FormItem :label="t('news.news.cover')" type="image" v-model="baTable.form.items!.cover" prop="cover" />
                     <FormItem :label="t('news.news.content')" type="editor" v-model="baTable.form.items!.content" prop="content" @keyup.enter.stop="" @keyup.ctrl.enter="baTable.onSubmit(formRef)" :placeholder="t('Please input field', { field: t('news.news.content') })" />
+                    <FormItem :label="t('news.news.category')" type="remoteSelects" v-model="baTable.form.items!.category" prop="category" :input-attr="{ pk: 'category.id', field: 'name', remoteUrl: '/admin/news.Category/index' }" :placeholder="t('Please select field', { field: t('news.news.category') })" />
                     <FormItem :label="t('news.news.hits')" type="number" v-model="baTable.form.items!.hits" prop="hits" :input-attr="{ step: 1 }" :placeholder="t('Please input field', { field: t('news.news.hits') })" />
-                    <FormItem :label="t('news.news.category')" type="remoteSelect" v-model="baTable.form.items!.category" prop="category" :input-attr="{ pk: 'category.id', field: 'name', remoteUrl: '/admin/news.Category/index' }" :placeholder="t('Please select field', { field: t('news.news.category') })" />
                 </el-form>
             </div>
         </el-scrollbar>
@@ -66,6 +66,7 @@ const baTable = inject('baTable') as baTableClass
 const { t } = useI18n()
 
 const rules: Partial<Record<string, FormItemRule[]>> = reactive({
+    title: [buildValidatorData({ name: 'required', title: t('news.news.title') })],
     content: [buildValidatorData({ name: 'editorRequired', title: t('news.news.content') })],
     hits: [buildValidatorData({ name: 'number', title: t('news.news.hits') })],
     create_time: [buildValidatorData({ name: 'date', title: t('news.news.create_time') })],

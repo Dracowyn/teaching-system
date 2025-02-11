@@ -1,13 +1,13 @@
 export default {
     id: 'id',
     title: 'title',
-    anthor: 'anthor',
+    author: 'author',
     cover: 'cover',
     content: 'content',
-    hits: 'hits',
     category: 'category',
     categorytable__name: 'name',
+    hits: 'hits',
     create_time: 'create_time',
     update_time: 'update_time',
-    'quick Search Fields': 'id,title,anthor,content',
+    'quick Search Fields': 'id,title,author,content',
 }
