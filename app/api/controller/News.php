@@ -56,7 +56,7 @@ class News extends Frontend
 			$listData[$key]['cover']     = $uploadCdnUrl . $value['cover'];
 			$listData[$key]['category']  = $param['cid'];
 			$listData[$key]['post_time'] = $value['create_time'];
-			$listData[$key]['hits']       = $value['hits'];
+			$listData[$key]['hits']      = $value['hits'];
 		}
 
 		// 随机排序
@@ -94,6 +94,9 @@ class News extends Frontend
 			$this->error(__('Not found news'));
 		}
 
+		// 更新点击量
+		$newsModel->where('id', $param['id'])->update(['hits' => $info['hits'] + 1]);
+
 		$infoData                  = [];
 		$infoData['id']            = $info['id'];
 		$infoData['title']         = $info['title'];
@@ -102,7 +105,7 @@ class News extends Frontend
 		$infoData['category_id']   = $info['category'][0];
 		$infoData['category_name'] = $info['categoryTable']['name'][0];
 		$infoData['post_time']     = $info['create_time'];
-		$infoData['hits']           = $info['hits'];
+		$infoData['hits']          = $info['hits'];
 
 		$this->success(
 			__('Get success'),
