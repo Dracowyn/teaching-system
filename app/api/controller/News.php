@@ -58,6 +58,9 @@ class News extends Frontend
 			$listData[$key]['post_time'] = $value['create_time'];
 		}
 
+		// 随机排序
+		shuffle($listData);
+
 		$this->success(
 			__('Get success'),
 			[
