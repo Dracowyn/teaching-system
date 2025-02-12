@@ -85,7 +85,7 @@ class News extends Frontend
 		$newsModel = new \app\common\model\news\News();
 
 		$info = $newsModel
-			->field(['id', 'title', 'author', 'content', 'category', 'create_time'])
+			->field(['id', 'title', 'author', 'content', 'category', 'hits', 'create_time'])
 			->where('id', $param['id'])
 			->find();
 
@@ -101,6 +101,7 @@ class News extends Frontend
 		$infoData['category_id']   = $info['category'][0];
 		$infoData['category_name'] = $info['categoryTable']['name'][0];
 		$infoData['post_time']     = $info['create_time'];
+		$infoData['hit']           = $info['hits'];
 
 		$this->success(
 			__('Get success'),
