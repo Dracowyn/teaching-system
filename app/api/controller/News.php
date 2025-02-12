@@ -41,7 +41,7 @@ class News extends Frontend
 
 		// 获取新闻列表
 		$list = $newsModel
-			->field(['id', 'title', 'author', 'cover', 'category', 'create_time'])
+			->field(['id', 'title', 'author', 'cover', 'category', 'hits', 'create_time'])
 			->whereFindInSet('category', $param['cid'])
 			->order('id', 'desc')
 			->page($param['page'], $param['limit'])
@@ -56,6 +56,7 @@ class News extends Frontend
 			$listData[$key]['cover']     = $uploadCdnUrl . $value['cover'];
 			$listData[$key]['category']  = $param['cid'];
 			$listData[$key]['post_time'] = $value['create_time'];
+			$listData[$key]['hits']       = $value['hits'];
 		}
 
 		// 随机排序
@@ -101,7 +102,7 @@ class News extends Frontend
 		$infoData['category_id']   = $info['category'][0];
 		$infoData['category_name'] = $info['categoryTable']['name'][0];
 		$infoData['post_time']     = $info['create_time'];
-		$infoData['hit']           = $info['hits'];
+		$infoData['hits']           = $info['hits'];
 
 		$this->success(
 			__('Get success'),
