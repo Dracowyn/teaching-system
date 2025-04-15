@@ -62,7 +62,15 @@ if (!function_exists('clean_xss')) {
      */
     function clean_xss(string $string): string
     {
-        return (new AntiXSS())->xss_clean($string);
+        $antiXss = new AntiXSS();
+
+        // 允许 style 属性（style="list-style-image: url(javascript:alert(0))" 任然可被正确过滤）
+        $antiXss->removeEvilAttributes(['style']);
+
+        // 检查到 xss 代码之后使用 cleanXss 替换它
+        $antiXss->setReplacement('cleanXss');
+
+        return $antiXss->xss_clean($string);
     }
 }
 
@@ -150,7 +158,10 @@ if (!function_exists('full_url')) {
         Event::trigger('uploadConfigInit', App::getInstance());
 
         $cdnUrl = Config::get('buildadmin.cdn_url');
-        if (!$cdnUrl) $cdnUrl = request()->upload['cdn'] ?? '//' . request()->host();
+        if (!$cdnUrl) {
+            $cdnUrl = request()->upload['cdn'] ?? '//' . request()->host();
+        }
+
         if ($domain === true) {
             $domain = $cdnUrl;
         } elseif ($domain === false) {
@@ -164,7 +175,15 @@ if (!function_exists('full_url')) {
         if (preg_match('/^http(s)?:\/\//', $relativeUrl) || preg_match($regex, $relativeUrl) || $domain === false) {
             return $relativeUrl;
         }
-        return $domain . $relativeUrl;
+
+        $url          = $domain . $relativeUrl;
+        $cdnUrlParams = Config::get('buildadmin.cdn_url_params');
+        if ($domain === $cdnUrl && $cdnUrlParams) {
+            $separator = str_contains($url, '?') ? '&' : '?';
+            $url       .= $separator . $cdnUrlParams;
+        }
+
+        return $url;
     }
 }
 

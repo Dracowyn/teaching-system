@@ -29,6 +29,10 @@
 </p>
 
 <br>
+<div align="center">
+  <img src="https://doc.buildadmin.com/images/readme/dashboard-radius.png" />
+</div>
+<br>
 
 ### 介绍
 🌈 基于 Vue3.3 + ThinkPHP8 + TypeScript + Vite + Pinia + Element Plus 等流行技术栈的实训项目教学系统。主要为学生提供后端数据接口服务。
@@ -54,13 +58,11 @@
 - [screenfull](https://github.com/sindresorhus/screenfull.js)
 - [mitt](https://github.com/developit/mitt)
 - [sass](https://github.com/sass/sass)
-- [wangEditor](https://github.com/wangeditor-team/wangEditor)
 - [echarts](https://github.com/apache/echarts)
 - [vueuse](https://github.com/vueuse/vueuse)
 - [lodash](https://github.com/lodash/lodash)
 - [eslint](https://github.com/eslint/eslint)
 - [prettier](https://github.com/prettier/prettier)
-- [vuepress](https://github.com/vuejs/vuepress)
 - [Sortable](https://github.com/SortableJS/Sortable)
 - [v-code-diff](https://github.com/Shimada666/v-code-diff)
 - [jetbrains](https://www.jetbrains.com/)
