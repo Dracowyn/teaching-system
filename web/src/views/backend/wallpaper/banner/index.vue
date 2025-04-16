@@ -50,7 +50,7 @@ const baTable = new baTableClass(
             { label: t('wallpaper.banner.sort'), prop: 'sort', align: 'center', operator: 'RANGE', sortable: 'custom' },
             { label: t('wallpaper.banner.wallpaperclassify__name'), prop: 'wallpaperClassify.name', align: 'center', render: 'tags', operator: false },
             { label: t('wallpaper.banner.wallpaperclassify__name'), prop: 'wallpaper_classify_ids', align: 'center', operator: 'FIND_IN_SET', show: false, comSearchRender: 'remoteSelect', remote: { pk: 'classify.id', field: 'name', remoteUrl: '/admin/wallpaper.Classify/index', multiple: true } },
-            { label: t('wallpaper.banner.select'), prop: 'select', align: 'center', render: 'tag', operator: 'eq', sortable: false, replaceValue: { self: t('wallpaper.banner.select self'), miniProgram: t('wallpaper.banner.select miniProgram') } },
+            { label: t('wallpaper.banner.target'), prop: 'target', align: 'center', render: 'tag', operator: 'eq', sortable: false, replaceValue: { self: t('wallpaper.banner.target self'), miniProgram: t('wallpaper.banner.target miniProgram') } },
             { label: t('wallpaper.banner.status'), prop: 'status', align: 'center', render: 'switch', operator: 'eq', sortable: false, replaceValue: { '0': t('wallpaper.banner.status 0'), '1': t('wallpaper.banner.status 1') } },
             { label: t('wallpaper.banner.create_time'), prop: 'create_time', align: 'center', render: 'datetime', operator: 'RANGE', sortable: 'custom', width: 160, timeFormat: 'yyyy-mm-dd hh:MM:ss' },
             { label: t('wallpaper.banner.update_time'), prop: 'update_time', align: 'center', render: 'datetime', operator: 'RANGE', sortable: 'custom', width: 160, timeFormat: 'yyyy-mm-dd hh:MM:ss' },
@@ -60,7 +60,7 @@ const baTable = new baTableClass(
         defaultOrder: { prop: 'sort', order: 'desc' },
     },
     {
-        defaultItems: { select: 'self', status: '1' },
+        defaultItems: { target: 'self', status: '1' },
     }
 )
 
