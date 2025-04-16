@@ -1,0 +1,17 @@
+export default {
+    id: 'id',
+    pic: 'pic',
+    sort: 'sort',
+    wallpaper_classify_ids: 'wallpaper_classify_ids',
+    wallpaperclassify__name: 'name',
+    select: 'select',
+    'select self': 'select self',
+    'select miniProgram': 'select miniProgram',
+    appid: 'appid',
+    status: 'status',
+    'status 0': 'status 0',
+    'status 1': 'status 1',
+    create_time: 'create_time',
+    update_time: 'update_time',
+    'quick Search Fields': 'pic,id',
+}

@@ -1,0 +1,17 @@
+export default {
+    id: 'ID',
+    pic: '图片',
+    sort: '权重',
+    wallpaper_classify_ids: '关联分类',
+    wallpaperclassify__name: '分类名称',
+    select: '下拉框',
+    'select self': '默认',
+    'select miniProgram': '外部小程序',
+    appid: '外部小程序ID',
+    status: '状态',
+    'status 0': '禁用',
+    'status 1': '启用',
+    create_time: '创建时间',
+    update_time: '修改时间',
+    'quick Search Fields': 'ID、图片',
+}
