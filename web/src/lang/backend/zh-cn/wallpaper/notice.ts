@@ -1,0 +1,16 @@
+export default {
+    id: 'ID',
+    title: '公告标题',
+    author: '公告作者',
+    content: '公告内容',
+    recommend: '推荐',
+    'recommend 0': '否',
+    'recommend 1': '是',
+    view: '访问量',
+    status: '状态',
+    'status 0': '禁用',
+    'status 1': '启用',
+    create_time: '创建时间',
+    update_time: '修改时间',
+    'quick Search Fields': 'ID',
+}

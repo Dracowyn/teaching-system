@@ -1,0 +1,16 @@
+export default {
+    id: 'id',
+    title: 'title',
+    author: 'author',
+    content: 'content',
+    recommend: 'recommend',
+    'recommend 0': 'recommend 0',
+    'recommend 1': 'recommend 1',
+    view: 'view',
+    status: 'status',
+    'status 0': 'status 0',
+    'status 1': 'status 1',
+    create_time: 'create_time',
+    update_time: 'update_time',
+    'quick Search Fields': 'id',
+}
