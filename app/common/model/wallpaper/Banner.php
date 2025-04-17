@@ -17,7 +17,7 @@ class Banner extends Model
 
     // 追加属性
     protected $append = [
-        'wallpaperClassify',
+        'classify',
     ];
 
     protected static function onBeforeInsert($model): void
@@ -43,14 +43,14 @@ class Banner extends Model
         return (string)$value;
     }
 
-    public function getWallpaperClassifyAttr($value, $row): array
+    public function getClassifyAttr($value, $row): array
     {
         return [
-            'name' => \app\common\model\wallpaper\Classify::whereIn('id', $row['wallpaper_classify_ids'])->column('name'),
+            'name' => \app\common\model\wallpaper\Classify::whereIn('id', $row['classify_id'])->column('name'),
         ];
     }
 
-    public function getWallpaperClassifyIdsAttr($value): array
+    public function getClassifyIdAttr($value): array
     {
         if ($value === '' || $value === null) return [];
         if (!is_array($value)) {
@@ -59,7 +59,7 @@ class Banner extends Model
         return $value;
     }
 
-    public function setWallpaperClassifyIdsAttr($value): string
+    public function setClassifyIdAttr($value): string
     {
         return is_array($value) ? implode(',', $value) : $value;
     }
