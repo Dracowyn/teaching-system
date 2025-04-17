@@ -166,4 +166,44 @@ class Wallpaper extends Frontend
 		]);
 	}
 
+	/**
+	 * 搜索壁纸
+	 * @return void
+	 * @throws Throwable
+	 */
+	public function search(): void
+	{
+		$keyword = $this->request->request('keyword');
+		if (!$keyword) {
+			$this->error(__('Keyword cannot be empty'));
+		}
+
+		$wallpaperModel = new \app\common\model\wallpaper\Wallpaper();
+		$list           = $wallpaperModel
+			->whereOr('description', 'like', '%' . $keyword . '%')
+			->whereOr('nickname', 'like', '%' . $keyword . '%')
+			->whereOr('tabs', 'like', '%' . $keyword . '%')
+			->field(['id', 'image', 'description', 'nickname', 'tabs', 'score'])
+			->limit(10)
+			->select();
+
+		// 重新组装数据
+		$data = [];
+		foreach ($list as $item) {
+			$data[] = [
+				'id'          => $item['id'],
+				'pic'         => get_sys_config('upload_cdn_url') . $item['image'],
+				'description' => $item['description'],
+				'nickname'    => $item['nickname'],
+				// tabs以空格或者,分隔，转换为数组
+				'tabs'        => array_filter(explode(' ', $item['tabs'])),
+				'score'       => number_format($item['score'], 1),
+			];
+		}
+
+		$this->success(__('Get success'), [
+			$data
+		]);
+	}
+
 }
