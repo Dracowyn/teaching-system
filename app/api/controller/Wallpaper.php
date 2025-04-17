@@ -5,6 +5,8 @@ namespace app\api\controller;
 use app\common\controller\Frontend;
 use app\common\model\wallpaper\Banner;
 use app\common\model\wallpaper\Classify;
+use app\common\model\wallpaper\Notice;
+use Faker\Factory;
 use think\db\exception\DataNotFoundException;
 use think\db\exception\DbException;
 use think\db\exception\ModelNotFoundException;
@@ -231,6 +233,49 @@ class Wallpaper extends Frontend
 				// tabs以空格或者,分隔，转换为数组
 				'tabs'        => array_filter(explode(' ', $item['tabs'])),
 				'score'       => number_format($item['score'], 1),
+			];
+		}
+
+		$this->success(__('Get success'), [
+			$data
+		]);
+	}
+
+	/*
+	 * 获取公告列表
+	 */
+	public function notice(): void
+	{
+		$recommend   = $this->request->request('recommend', 0);
+		$page        = $this->request->request('page', 1);
+		$limit       = $this->request->request('limit', 10);
+		$noticeModel = new Notice();
+		$faker       = Factory::create('zh_CN');
+		// 构建查询条件
+		$where = ['status' => 1];
+		// 如果recommend参数为1，则只查询推荐公告
+		if ($recommend == 1) {
+			$where['recommend'] = 1;
+		}
+
+		$list = $noticeModel
+			->where($where)
+			->field(['id', 'title', 'author', 'content', 'recommend', 'create_time'])
+			->order('create_time', 'desc')
+			->page($page, $limit)
+			->select();
+
+		// 重新组装数据
+		$data = [];
+		foreach ($list as $item) {
+			$data[] = [
+				'id'          => $item['id'],
+				'title'       => $item['title'],
+				'author'      => $item['author'],
+				'view'        => $faker->numberBetween(1000, 10000),
+				'content'     => $item['content'],
+				'recommend'   => $item['recommend'],
+				'create_time' => date('Y-m-d H:i:s', $item['create_time']),
 			];
 		}
 
