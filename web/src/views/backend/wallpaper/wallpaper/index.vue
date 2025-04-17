@@ -50,6 +50,8 @@ const baTable = new baTableClass(
             { label: t('wallpaper.wallpaper.nickname'), prop: 'nickname', align: 'center', operatorPlaceholder: t('Fuzzy query'), operator: 'LIKE', sortable: false },
             { label: t('wallpaper.wallpaper.tabs'), prop: 'tabs', align: 'center', operatorPlaceholder: t('Fuzzy query'), render: 'tags', operator: 'LIKE', sortable: false, replaceValue: { } },
             { label: t('wallpaper.wallpaper.score'), prop: 'score', align: 'center', operator: 'RANGE', sortable: false },
+            { label: t('wallpaper.wallpaper.classify__name'), prop: 'classify.name', align: 'center', render: 'tags', operator: false },
+            { label: t('wallpaper.wallpaper.classify__name'), prop: 'classify_id', align: 'center', operator: 'FIND_IN_SET', show: false, comSearchRender: 'remoteSelect', remote: { pk: 'classify.id', field: 'name', remoteUrl: '/admin/wallpaper.Classify/index', multiple: true } },
             { label: t('wallpaper.wallpaper.create_time'), prop: 'create_time', align: 'center', render: 'datetime', operator: 'RANGE', sortable: 'custom', width: 160, timeFormat: 'yyyy-mm-dd hh:MM:ss' },
             { label: t('wallpaper.wallpaper.update_time'), prop: 'update_time', align: 'center', render: 'datetime', operator: 'RANGE', sortable: 'custom', width: 160, timeFormat: 'yyyy-mm-dd hh:MM:ss' },
             { label: t('Operate'), align: 'center', width: 100, render: 'buttons', buttons: optButtons, operator: false },

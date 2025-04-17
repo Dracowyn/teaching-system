@@ -46,19 +46,20 @@ const baTable = new baTableClass(
         pk: 'id',
         column: [
             { type: 'selection', align: 'center', operator: false },
-            { label: t('wallpaper.classify.string'), prop: 'string', align: 'center', operatorPlaceholder: t('Fuzzy query'), operator: 'LIKE', sortable: false },
+            { label: t('wallpaper.classify.name'), prop: 'name', align: 'center', operatorPlaceholder: t('Fuzzy query'), operator: 'LIKE', sortable: false },
             { label: t('wallpaper.classify.pic'), prop: 'pic', align: 'center', render: 'image', operator: false },
             { label: t('wallpaper.classify.recommend'), prop: 'recommend', align: 'center', render: 'switch', operator: 'eq', sortable: false, replaceValue: { '0': t('wallpaper.classify.recommend 0'), '1': t('wallpaper.classify.recommend 1') } },
             { label: t('wallpaper.classify.sort'), prop: 'sort', align: 'center', operator: 'RANGE', sortable: 'custom' },
+            { label: t('wallpaper.classify.status'), prop: 'status', align: 'center', render: 'switch', operator: 'eq', sortable: false, replaceValue: { '0': t('wallpaper.classify.status 0'), '1': t('wallpaper.classify.status 1') } },
             { label: t('wallpaper.classify.create_time'), prop: 'create_time', align: 'center', render: 'datetime', operator: 'RANGE', sortable: 'custom', width: 160, timeFormat: 'yyyy-mm-dd hh:MM:ss' },
             { label: t('wallpaper.classify.update_time'), prop: 'update_time', align: 'center', render: 'datetime', operator: 'RANGE', sortable: 'custom', width: 160, timeFormat: 'yyyy-mm-dd hh:MM:ss' },
             { label: t('Operate'), align: 'center', width: 140, render: 'buttons', buttons: optButtons, operator: false },
         ],
-        dblClickNotEditColumn: [undefined, 'recommend'],
+        dblClickNotEditColumn: [undefined, 'recommend', 'status'],
         defaultOrder: { prop: 'sort', order: 'desc' },
     },
     {
-        defaultItems: {},
+        defaultItems: { status: '1' },
     }
 )
 

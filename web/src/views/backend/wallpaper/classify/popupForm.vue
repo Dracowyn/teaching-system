@@ -30,10 +30,11 @@
                     :label-width="baTable.form.labelWidth + 'px'"
                     :rules="rules"
                 >
-                    <FormItem :label="t('wallpaper.classify.string')" type="string" v-model="baTable.form.items!.string" prop="string" :placeholder="t('Please input field', { field: t('wallpaper.classify.string') })" />
+                    <FormItem :label="t('wallpaper.classify.name')" type="string" v-model="baTable.form.items!.name" prop="name" :placeholder="t('Please input field', { field: t('wallpaper.classify.name') })" />
                     <FormItem :label="t('wallpaper.classify.pic')" type="image" v-model="baTable.form.items!.pic" prop="pic" />
                     <FormItem :label="t('wallpaper.classify.recommend')" type="switch" v-model="baTable.form.items!.recommend" prop="recommend" :input-attr="{ content: { '0': t('wallpaper.classify.recommend 0'), '1': t('wallpaper.classify.recommend 1') } }" />
                     <FormItem :label="t('wallpaper.classify.sort')" type="number" v-model="baTable.form.items!.sort" prop="sort" :input-attr="{ step: 1 }" :placeholder="t('Please input field', { field: t('wallpaper.classify.sort') })" />
+                    <FormItem :label="t('wallpaper.classify.status')" type="switch" v-model="baTable.form.items!.status" prop="status" :input-attr="{ content: { '0': t('wallpaper.classify.status 0'), '1': t('wallpaper.classify.status 1') } }" />
                 </el-form>
             </div>
         </el-scrollbar>
@@ -64,6 +65,8 @@ const baTable = inject('baTable') as baTableClass
 const { t } = useI18n()
 
 const rules: Partial<Record<string, FormItemRule[]>> = reactive({
+    name: [buildValidatorData({ name: 'required', title: t('wallpaper.classify.name') })],
+    pic: [buildValidatorData({ name: 'required', title: t('wallpaper.classify.pic') })],
     create_time: [buildValidatorData({ name: 'date', title: t('wallpaper.classify.create_time') })],
     update_time: [buildValidatorData({ name: 'date', title: t('wallpaper.classify.update_time') })],
 })
