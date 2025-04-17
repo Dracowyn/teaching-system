@@ -18,7 +18,7 @@ class Notice extends Backend
 
     protected array|string $preExcludeFields = ['id', 'create_time', 'update_time'];
 
-    protected string|array $quickSearchField = ['id'];
+    protected string|array $quickSearchField = ['id', 'title', 'author', 'content'];
 
     public function initialize(): void
     {

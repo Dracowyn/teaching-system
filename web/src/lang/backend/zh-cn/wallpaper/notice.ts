@@ -12,5 +12,5 @@ export default {
     'status 1': '启用',
     create_time: '创建时间',
     update_time: '修改时间',
-    'quick Search Fields': 'ID',
+    'quick Search Fields': 'ID、公告标题、公告作者、公告内容',
 }
