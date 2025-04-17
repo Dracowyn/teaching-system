@@ -206,4 +206,37 @@ class Wallpaper extends Frontend
 		]);
 	}
 
+	/**
+	 * 获取随机壁纸
+	 * @return void
+	 * @throws Throwable
+	 */
+	public function random(): void
+	{
+		$wallpaperModel = new \app\common\model\wallpaper\Wallpaper();
+		$item           = $wallpaperModel
+			->field(['id', 'image', 'description', 'nickname', 'tabs', 'score'])
+			->orderRaw('rand()')
+			->limit(1)
+			->find();
+
+		// 重新组装数据
+		$data = [];
+		if ($item) {
+			$data = [
+				'id'          => $item['id'],
+				'pic'         => get_sys_config('upload_cdn_url') . $item['image'],
+				'description' => $item['description'],
+				'nickname'    => $item['nickname'],
+				// tabs以空格或者,分隔，转换为数组
+				'tabs'        => array_filter(explode(' ', $item['tabs'])),
+				'score'       => number_format($item['score'], 1),
+			];
+		}
+
+		$this->success(__('Get success'), [
+			$data
+		]);
+	}
+
 }
