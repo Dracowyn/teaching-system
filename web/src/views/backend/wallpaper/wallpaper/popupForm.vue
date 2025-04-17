@@ -34,8 +34,8 @@
                     <FormItem :label="t('wallpaper.wallpaper.description')" type="string" v-model="baTable.form.items!.description" prop="description" :placeholder="t('Please input field', { field: t('wallpaper.wallpaper.description') })" />
                     <FormItem :label="t('wallpaper.wallpaper.nickname')" type="string" v-model="baTable.form.items!.nickname" prop="nickname" :placeholder="t('Please input field', { field: t('wallpaper.wallpaper.nickname') })" />
                     <FormItem :label="t('wallpaper.wallpaper.tabs')" type="string" v-model="baTable.form.items!.tabs" prop="tabs" :placeholder="t('Please input field', { field: t('wallpaper.wallpaper.tabs') })" />
-                    <FormItem :label="t('wallpaper.wallpaper.score')" type="number" v-model="baTable.form.items!.score" prop="score" :input-attr="{ step: 1 }" :placeholder="t('Please input field', { field: t('wallpaper.wallpaper.score') })" />
-                    <FormItem :label="t('wallpaper.wallpaper.wallpaper_classify_ids')" type="remoteSelects" v-model="baTable.form.items!.wallpaper_classify_ids" prop="wallpaper_classify_ids" :input-attr="{ pk: 'classify.id', field: 'string', remoteUrl: '/admin/wallpaper.Classify/index' }" :placeholder="t('Please select field', { field: t('wallpaper.wallpaper.wallpaper_classify_ids') })" />
+                    <FormItem :label="t('wallpaper.wallpaper.score')" type="number" v-model="baTable.form.items!.score" prop="score" :input-attr="{ step: 0.1 }" :placeholder="t('Please input field', { field: t('wallpaper.wallpaper.score') })" />
+                    <FormItem :label="t('wallpaper.wallpaper.classify_id')" type="remoteSelects" v-model="baTable.form.items!.classify_id" prop="classify_id" :input-attr="{ pk: 'classify.id', field: 'name', remoteUrl: '/admin/wallpaper.Classify/index' }" :placeholder="t('Please select field', { field: t('wallpaper.wallpaper.classify_id') })" />
                 </el-form>
             </div>
         </el-scrollbar>
@@ -67,8 +67,8 @@ const { t } = useI18n()
 
 const rules: Partial<Record<string, FormItemRule[]>> = reactive({
     image: [buildValidatorData({ name: 'required', title: t('wallpaper.wallpaper.image') })],
-    score: [buildValidatorData({ name: 'float', title: t('wallpaper.wallpaper.score') }), buildValidatorData({ name: 'required', title: t('wallpaper.wallpaper.score') })],
-    wallpaper_classify_ids: [buildValidatorData({ name: 'required', title: t('wallpaper.wallpaper.wallpaper_classify_ids') })],
+    score: [buildValidatorData({ name: 'required', title: t('wallpaper.wallpaper.score') }), buildValidatorData({ name: 'number', title: t('wallpaper.wallpaper.score') })],
+    classify_id: [buildValidatorData({ name: 'required', title: t('wallpaper.wallpaper.classify_id') })],
     create_time: [buildValidatorData({ name: 'date', title: t('wallpaper.wallpaper.create_time') })],
     update_time: [buildValidatorData({ name: 'date', title: t('wallpaper.wallpaper.update_time') })],
 })

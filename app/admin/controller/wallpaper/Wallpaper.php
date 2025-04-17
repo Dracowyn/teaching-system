@@ -18,7 +18,7 @@ class Wallpaper extends Backend
 
     protected array|string $preExcludeFields = ['id', 'create_time', 'update_time'];
 
-    protected string|array $quickSearchField = ['id'];
+    protected string|array $quickSearchField = ['description', 'nickname', 'tabs', 'classify_id', 'id'];
 
     public function initialize(): void
     {

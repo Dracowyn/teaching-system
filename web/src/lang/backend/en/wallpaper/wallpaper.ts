@@ -5,8 +5,9 @@ export default {
     nickname: 'nickname',
     tabs: 'tabs',
     score: 'score',
-    wallpaper_classify_ids: 'wallpaper_classify_ids',
+    classify_id: 'classify_id',
+    classify__name: 'name',
     create_time: 'create_time',
     update_time: 'update_time',
-    'quick Search Fields': 'id',
+    'quick Search Fields': 'description,nickname,tabs,classify_id,id',
 }
