@@ -241,8 +241,9 @@ class Wallpaper extends Frontend
 		]);
 	}
 
-	/*
+	/**
 	 * 获取公告列表
+	 * @return void
 	 */
 	public function notice(): void
 	{
@@ -281,6 +282,47 @@ class Wallpaper extends Frontend
 
 		$this->success(__('Get success'), [
 			$data
+		]);
+	}
+
+	/**
+	 * 获取公告详情
+	 * @return void
+	 * @throws DataNotFoundException
+	 * @throws DbException
+	 * @throws ModelNotFoundException
+	 */
+	public function noticeDetail(): void
+	{
+		$id = $this->request->request('id');
+		if (!$id) {
+			$this->error(__('Notice id cannot be empty'));
+		}
+
+		$noticeModel = new Notice();
+		$faker       = Factory::create('zh_CN');
+		$detail      = $noticeModel
+			->where('id', $id)
+			->field(['id', 'title', 'author', 'content', 'recommend', 'create_time'])
+			->find();
+
+		if (empty($detail)) {
+			$this->error(__('Notice not found'));
+		}
+
+		// 重新组装数据
+		$detail = [
+			'id'          => $detail['id'],
+			'title'       => $detail['title'],
+			'author'      => $detail['author'],
+			'view'        => $faker->numberBetween(1000, 10000),
+			'content'     => $detail['content'],
+			'recommend'   => $detail['recommend'],
+			'create_time' => date('Y-m-d H:i:s', $detail['create_time']),
+		];
+
+		$this->success(__('Get success'), [
+			$detail
 		]);
 	}
 
