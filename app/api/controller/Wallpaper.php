@@ -45,9 +45,9 @@ class Wallpaper extends Frontend
 			];
 		}
 
-		$this->success(__('Get success'), [
-			$data,
-		]);
+		$this->success(__('Get success'),
+			$data
+		);
 	}
 
 	/**
@@ -80,9 +80,9 @@ class Wallpaper extends Frontend
 			];
 		}
 
-		$this->success(__('Get success'), [
+		$this->success(__('Get success'),
 			$data
-		]);
+		);
 	}
 
 	/**
@@ -122,9 +122,9 @@ class Wallpaper extends Frontend
 			];
 		}
 
-		$this->success(__('Get success'), [
+		$this->success(__('Get success'),
 			$data
-		]);
+		);
 	}
 
 	/**
@@ -163,9 +163,9 @@ class Wallpaper extends Frontend
 			'score'       => number_format($detail['score'], 1),
 		];
 
-		$this->success(__('Get success'), [
+		$this->success(__('Get success'),
 			$detail
-		]);
+		);
 	}
 
 	/**
@@ -203,9 +203,9 @@ class Wallpaper extends Frontend
 			];
 		}
 
-		$this->success(__('Get success'), [
+		$this->success(__('Get success'),
 			$data
-		]);
+		);
 	}
 
 	/**
@@ -236,9 +236,9 @@ class Wallpaper extends Frontend
 			];
 		}
 
-		$this->success(__('Get success'), [
+		$this->success(__('Get success'),
 			$data
-		]);
+		);
 	}
 
 	/**
@@ -280,9 +280,9 @@ class Wallpaper extends Frontend
 			];
 		}
 
-		$this->success(__('Get success'), [
+		$this->success(__('Get success'),
 			$data
-		]);
+		);
 	}
 
 	/**
@@ -321,9 +321,9 @@ class Wallpaper extends Frontend
 			'create_time' => date('Y-m-d H:i:s', $detail['create_time']),
 		];
 
-		$this->success(__('Get success'), [
+		$this->success(__('Get success'),
 			$detail
-		]);
+		);
 	}
 
 }
