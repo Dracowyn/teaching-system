@@ -51,11 +51,11 @@ class Helper
      * @var array
      */
     protected static array $menuChildren = [
-        ['type' => 'button', 'title' => '查看', 'name' => '/index', 'status' => '1'],
-        ['type' => 'button', 'title' => '添加', 'name' => '/add', 'status' => '1'],
-        ['type' => 'button', 'title' => '编辑', 'name' => '/edit', 'status' => '1'],
-        ['type' => 'button', 'title' => '删除', 'name' => '/del', 'status' => '1'],
-        ['type' => 'button', 'title' => '快速排序', 'name' => '/sortable', 'status' => '1'],
+        ['type' => 'button', 'title' => '查看', 'name' => '/index', 'status' => 1],
+        ['type' => 'button', 'title' => '添加', 'name' => '/add', 'status' => 1],
+        ['type' => 'button', 'title' => '编辑', 'name' => '/edit', 'status' => 1],
+        ['type' => 'button', 'title' => '删除', 'name' => '/del', 'status' => 1],
+        ['type' => 'button', 'title' => '快速排序', 'name' => '/sortable', 'status' => 1],
     ];
 
     /**
@@ -286,6 +286,7 @@ class Helper
         $connection = $data['table']['databaseConnection'] ?: config('database.default');
         $log        = CrudLog::create([
             'table_name' => $data['table']['name'],
+            'comment'    => $data['table']['comment'],
             'table'      => $data['table'],
             'fields'     => $data['fields'],
             'connection' => $connection,
@@ -349,7 +350,7 @@ class Helper
                 return ['precision' => $dataTypeLimit[0], 'scale' => $dataTypeLimit[1] ?? 0];
             }
             $scale = isset($field['precision']) ? intval($field['precision']) : 0;
-            return ['precision' => $field['length'] ?: 10, 'scale' => $scale];
+            return ['precision' => $field['length'] ?? 10, 'scale' => $scale];
         } elseif (in_array($type, $fieldType['values'])) {
             foreach ($dataTypeLimit as &$item) {
                 $item = str_replace(['"', "'"], '', $item);

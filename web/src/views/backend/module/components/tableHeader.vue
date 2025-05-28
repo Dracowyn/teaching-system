@@ -22,7 +22,7 @@
                         <span class="table-header-operate-text">{{ t('module.Local module') }}</span>
                     </el-button>
                 </el-button-group>
-                <el-button-group class="ml10">
+                <el-button-group class="ml10 publish-module-button-group">
                     <el-button @click="navigateTo('https://doc.buildadmin.com/senior/module/start.html')" v-blur type="success">
                         <Icon name="fa fa-cloud-upload" color="#ffffff" size="14" />
                         <span class="table-header-operate-text">{{ t('module.Publishing module') }}</span>
@@ -33,9 +33,9 @@
                     </el-button>
                 </el-button-group>
 
-                <el-button v-blur class="ml10" @click="onShowBaAccount" type="success">
+                <el-button v-blur class="ml10 ba-account-button" @click="onShowBaAccount" type="success">
                     <Icon name="fa fa-user-o" color="#ffffff" size="14" />
-                    <span class="table-header-operate-text">{{ t('module.Member information') }}</span>
+                    <span class="table-header-operate-text">{{ t('layouts.Member information') }}</span>
                 </el-button>
             </div>
             <div class="table-search">
@@ -55,11 +55,8 @@ import { debounce } from 'lodash-es'
 import { useI18n } from 'vue-i18n'
 import { loadData, onRefreshTableData } from '../index'
 import { state } from '../store'
-import { getUserInfo } from '/@/api/backend/module'
-import { useBaAccount } from '/@/stores/baAccount'
 
 const { t } = useI18n()
-const baAccount = useBaAccount()
 const localModules = () => {
     state.table.onlyLocal = !state.table.onlyLocal
     loadData()
@@ -67,17 +64,6 @@ const localModules = () => {
 
 const onShowBaAccount = () => {
     state.dialog.baAccount = true
-    state.loading.common = true
-    getUserInfo()
-        .then((res) => {
-            baAccount.dataFill(res.data.userInfo)
-        })
-        .catch(() => {
-            baAccount.removeToken()
-        })
-        .finally(() => {
-            state.loading.common = false
-        })
 }
 
 const onSearchInput = debounce(() => {
@@ -123,5 +109,17 @@ const uploadInstall = () => {
 .local-active {
     border-color: var(--el-button-active-border-color);
     background-color: var(--el-button-active-bg-color);
+}
+@media screen and (max-width: 1300px) {
+    .ba-account-button {
+        display: block;
+        margin: 10px 0 0 0;
+    }
+}
+@media screen and (max-width: 1100px) {
+    .publish-module-button-group {
+        display: block;
+        margin: 10px 0 0 0;
+    }
 }
 </style>

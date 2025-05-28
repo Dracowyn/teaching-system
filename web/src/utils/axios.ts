@@ -8,6 +8,7 @@ import adminBaseRoute from '/@/router/static/adminBase'
 import { memberCenterBaseRoutePath } from '/@/router/static/memberCenterBase'
 import { useAdminInfo } from '/@/stores/adminInfo'
 import { useConfig } from '/@/stores/config'
+import { SYSTEM_ZINDEX } from '/@/stores/constant/common'
 import { useUserInfo } from '/@/stores/userInfo'
 import { isAdminApp } from '/@/utils/common'
 
@@ -63,7 +64,7 @@ function createAxios<Data = any, T = ApiPromise<Data>>(axiosConfig: AxiosRequest
     // 合并默认请求选项
     options = Object.assign(
         {
-            CancelDuplicateRequest: true, // 是否开启取消重复请求, 默认为 true
+            cancelDuplicateRequest: true, // 是否开启取消重复请求, 默认为 true
             loading: false, // 是否开启loading层效果, 默认为false
             reductDataFormat: true, // 是否开启简洁的数据结构响应, 默认为true
             showErrorMessage: true, // 是否开启接口错误信息展示,默认为true
@@ -78,7 +79,7 @@ function createAxios<Data = any, T = ApiPromise<Data>>(axiosConfig: AxiosRequest
     Axios.interceptors.request.use(
         (config) => {
             removePending(config)
-            options.CancelDuplicateRequest && addPending(config)
+            options.cancelDuplicateRequest && addPending(config)
             // 创建loading实例
             if (options.loading) {
                 loadingInstance.count++
@@ -180,7 +181,7 @@ function createAxios<Data = any, T = ApiPromise<Data>>(axiosConfig: AxiosRequest
                         ElNotification({
                             type: 'error',
                             message: response.data.msg,
-                            zIndex: 9999,
+                            zIndex: SYSTEM_ZINDEX,
                         })
                     }
                     // 自动跳转到路由name或path
@@ -208,7 +209,7 @@ function createAxios<Data = any, T = ApiPromise<Data>>(axiosConfig: AxiosRequest
                     ElNotification({
                         message: response.data.msg ? response.data.msg : i18n.global.t('axios.Operation successful'),
                         type: 'success',
-                        zIndex: 9999,
+                        zIndex: SYSTEM_ZINDEX,
                     })
                 }
             }
@@ -288,7 +289,7 @@ function httpErrorStatusHandle(error: any) {
     ElNotification({
         type: 'error',
         message,
-        zIndex: 9999,
+        zIndex: SYSTEM_ZINDEX,
     })
 }
 
@@ -367,7 +368,7 @@ interface LoadingInstance {
 }
 interface Options {
     // 是否开启取消重复请求, 默认为 true
-    CancelDuplicateRequest?: boolean
+    cancelDuplicateRequest?: boolean
     // 是否开启loading层效果, 默认为false
     loading?: boolean
     // 是否开启简洁的数据结构响应, 默认为true

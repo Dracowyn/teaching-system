@@ -2,19 +2,19 @@
 
 namespace app\common\model;
 
-use ba\Random;
 use think\Model;
 
 /**
  * 会员公共模型
  * @property int    $id              会员ID
  * @property string $password        密码密文
- * @property string $salt            密码盐
+ * @property string $salt            密码盐（废弃待删）
  * @property int    $login_failure   登录失败次数
  * @property string $last_login_time 上次登录时间
  * @property string $last_login_ip   上次登录IP
  * @property string $email           会员邮箱
  * @property string $mobile          会员手机号
+ * @property string $status          状态:enable=启用,disable=禁用,...(string存储，可自定义其他)
  */
 class User extends Model
 {
@@ -32,9 +32,7 @@ class User extends Model
 
     public function resetPassword($uid, $newPassword): int|User
     {
-        $salt   = Random::build('alnum', 16);
-        $passwd = encrypt_password($newPassword, $salt);
-        return $this->where(['id' => $uid])->update(['password' => $passwd, 'salt' => $salt]);
+        return $this->where(['id' => $uid])->update(['password' => hash_password($newPassword), 'salt' => '']);
     }
 
     public function getMoneyAttr($value): string

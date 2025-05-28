@@ -21,8 +21,6 @@ class Rule extends Backend
      */
     protected Tree $tree;
 
-    protected array $noNeedLogin = ['index'];
-
     protected string|array $preExcludeFields = ['create_time', 'update_time'];
 
     protected string|array $defaultSortField = ['weigh' => 'desc'];
@@ -219,7 +217,7 @@ class Rule extends Backend
      */
     public function select(): void
     {
-        $data = $this->getRules([['status', '=', '1']]);
+        $data = $this->getRules([['status', '=', 1]]);
 
         if ($this->assembleTree) {
             $data = $this->tree->assembleTree($this->tree->getTreeArray($data, 'title'));

@@ -254,7 +254,7 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, onMounted, onUnmounted, ref } from 'vue'
+import { reactive, onMounted, onUnmounted, useTemplateRef } from 'vue'
 import Header from '/@/layouts/frontend/components/header.vue'
 import Footer from '/@/layouts/frontend/components/footer.vue'
 import { useSiteConfig } from '/@/stores/siteConfig'
@@ -281,8 +281,8 @@ const router = useRouter()
 const userInfo = useUserInfo()
 const siteConfig = useSiteConfig()
 const memberCenter = useMemberCenter()
-const formRef = ref<FormInstance>()
-const retrieveFormRef = ref<FormInstance>()
+const formRef = useTemplateRef('formRef')
+const retrieveFormRef = useTemplateRef('retrieveFormRef')
 
 interface State {
     form: {
@@ -402,7 +402,7 @@ const onSubmit = (captchaInfo = '') => {
     state.form.captchaInfo = captchaInfo
     checkIn('post', state.form)
         .then((res) => {
-            userInfo.dataFill(res.data.userInfo)
+            userInfo.dataFill(res.data.userInfo, false)
             if (state.to) return (location.href = state.to)
             router.push({ path: res.data.routePath })
         })
@@ -475,7 +475,7 @@ const sendRetrieveCaptcha = (captchaInfo: string) => {
         })
 }
 
-const switchTab = (formRef: FormInstance | undefined = undefined, tab: 'login' | 'register') => {
+const switchTab = (formRef: FormInstance | null | undefined = undefined, tab: 'login' | 'register') => {
     state.form.tab = tab
     if (tab == 'register') state.form.username = ''
     if (formRef) formRef.clearValidate()

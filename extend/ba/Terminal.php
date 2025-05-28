@@ -159,11 +159,17 @@ class Terminal
                 'command' => $command,
             ];
         } else {
-            $command = [
-                'cwd'     => root_path() . $command['cwd'],
-                'command' => $command['command'],
-            ];
+            $command['cwd'] = root_path() . $command['cwd'];
         }
+
+        if (str_contains($command['command'], '%')) {
+            $args = request()->param('extend', '');
+            $args = explode('~~', $args);
+
+            array_unshift($args, $command['command']);
+            $command['command'] = call_user_func_array('sprintf', $args);
+        }
+
         $command['cwd'] = str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $command['cwd']);
         return $command;
     }
@@ -205,6 +211,10 @@ class Terminal
 
         $this->beforeExecution();
         $this->outputFlag('link-success');
+
+        if (!empty($command['notes'])) {
+            $this->output('> ' . __($command['notes']), false);
+        }
         $this->output('> ' . $command['command'], false);
 
         $this->process = proc_open($command['command'], $this->descriptorsPec, $this->pipes, $command['cwd']);

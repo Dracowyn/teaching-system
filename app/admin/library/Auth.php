@@ -143,7 +143,7 @@ class Auth extends \ba\Auth
                     $this->setError('Account not exist');
                     return false;
                 }
-                if ($this->model['status'] != '1') {
+                if ($this->model['status'] != 'enable') {
                     $this->setError('Account disabled');
                     return false;
                 }
@@ -172,7 +172,7 @@ class Auth extends \ba\Auth
             $this->setError('Username is incorrect');
             return false;
         }
-        if ($this->model->status == '0') {
+        if ($this->model->status == 'disable') {
             $this->setError('Account disabled');
             return false;
         }
@@ -197,7 +197,7 @@ class Auth extends \ba\Auth
         }
 
         // 密码检查
-        if ($this->model->password != encrypt_password($password, $this->model->salt)) {
+        if (!verify_password($password, $this->model->password, ['salt' => $this->model->salt])) {
             $this->loginFailed();
             $this->setError('Password is incorrect');
             return false;
@@ -429,7 +429,7 @@ class Auth extends \ba\Auth
     public function getGroupChildGroups(int $groupId, array &$children): void
     {
         $childrenTemp = AdminGroup::where('pid', $groupId)
-            ->where('status', '1')
+            ->where('status', 1)
             ->select();
         foreach ($childrenTemp as $item) {
             $children[] = $item['id'];

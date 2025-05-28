@@ -35,7 +35,7 @@
 <br>
 
 ### 介绍
-🌈 基于 Vue3.3 + ThinkPHP8 + TypeScript + Vite + Pinia + Element Plus 等流行技术栈的实训项目教学系统。主要为学生提供后端数据接口服务。
+🌈 基于 Vue3.x + ThinkPHP8 + TypeScript + Vite + Pinia + Element Plus 等流行技术栈的实训项目教学系统。主要为学生提供后端数据接口服务。
 
 ### 包含项目
 - 通讯录后端

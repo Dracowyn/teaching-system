@@ -2,12 +2,13 @@
 
 namespace app\admin\model;
 
-use ba\Random;
 use think\Model;
 use think\model\relation\BelongsTo;
 
 /**
  * User 模型
+ * @property int    $id      用户ID
+ * @property string password 密码密文
  */
 class User extends Model
 {
@@ -33,6 +34,11 @@ class User extends Model
         return bcmul($value, 100, 2);
     }
 
+    public function userGroup(): BelongsTo
+    {
+        return $this->belongsTo(UserGroup::class, 'group_id');
+    }
+
     /**
      * 重置用户密码
      * @param int|string $uid         用户ID
@@ -41,13 +47,6 @@ class User extends Model
      */
     public function resetPassword(int|string $uid, string $newPassword): int|User
     {
-        $salt   = Random::build('alnum', 16);
-        $passwd = encrypt_password($newPassword, $salt);
-        return $this->where(['id' => $uid])->update(['password' => $passwd, 'salt' => $salt]);
-    }
-
-    public function group(): BelongsTo
-    {
-        return $this->belongsTo(UserGroup::class, 'group_id');
+        return $this->where(['id' => $uid])->update(['password' => hash_password($newPassword), 'salt' => '']);
     }
 }

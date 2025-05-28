@@ -1,6 +1,7 @@
 <?php
 // +----------------------------------------------------------------------
-// | BuildAdmin-WEB终端配置
+// | BuildAdmin-WEB 终端配置
+// | 命令中可以使用 %s %f 等占位符，系统将从 request()->param('extend', '') 取值，以 ~~ 分割后使用 sprintf 函数替换
 // +----------------------------------------------------------------------
 
 return [
@@ -10,7 +11,11 @@ return [
     'commands'            => [
         // 数据库迁移命令
         'migrate'               => [
-            'run'        => 'php think migrate:run',
+            'run'        => [
+                'cwd'     => '',
+                'command' => 'php think migrate:run',
+                'notes'   => 'Start the database migration'
+            ],
             'rollback'   => 'php think migrate:rollback',
             'breakpoint' => 'php think migrate:breakpoint',
         ],
@@ -103,22 +108,27 @@ return [
             'npm'  => [
                 'cwd'     => 'web',
                 'command' => 'npm run build',
+                'notes'   => 'Start executing the build command of the web project',
             ],
             'cnpm' => [
                 'cwd'     => 'web',
                 'command' => 'cnpm run build',
+                'notes'   => 'Start executing the build command of the web project',
             ],
             'yarn' => [
                 'cwd'     => 'web',
                 'command' => 'yarn run build',
+                'notes'   => 'Start executing the build command of the web project',
             ],
             'pnpm' => [
                 'cwd'     => 'web',
                 'command' => 'pnpm run build',
+                'notes'   => 'Start executing the build command of the web project',
             ],
             'ni'   => [
                 'cwd'     => 'web',
                 'command' => 'nr build',
+                'notes'   => 'Start executing the build command of the web project',
             ],
         ],
         // 设置 NPM 源
@@ -135,10 +145,18 @@ return [
             'huawei'   => 'composer config -g repos.packagist composer https://mirrors.huaweicloud.com/repository/php/',
             'kkame'    => 'composer config -g repos.packagist composer https://packagist.kr',
         ],
+        'npx'                   => [
+            'prettier' => [
+                'cwd'     => 'web',
+                'command' => 'npx prettier --write %s',
+                'notes'   => 'Start formatting the web project code',
+            ],
+        ],
         'composer'              => [
             'update' => [
                 'cwd'     => '',
                 'command' => 'composer update --no-interaction',
+                'notes'   => 'Start installing the composer dependencies'
             ]
         ],
         'ping'                  => [
