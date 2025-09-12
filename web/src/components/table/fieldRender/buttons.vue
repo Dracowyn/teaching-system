@@ -8,12 +8,14 @@
                     v-blur
                     @click="onButtonClick(btn)"
                     :class="btn.class"
+                    size="small"
                     class="ba-table-render-buttons-item"
                     :type="btn.type"
+                    :loading="btn.loading && btn.loading(row, field)"
                     :disabled="btn.disabled && btn.disabled(row, field)"
-                    v-bind="btn.attr"
+                    v-bind="invokeTableContextDataFun(btn.attr, { row, field, cellValue: btn, column, index })"
                 >
-                    <Icon v-if="btn.icon" :name="btn.icon" />
+                    <Icon v-if="btn.icon" size="14" color="var(--ba-bg-color-overlay)" :name="btn.icon" />
                     <div v-if="btn.text" class="text">{{ getTranslation(btn.text) }}</div>
                 </el-button>
 
@@ -29,12 +31,14 @@
                         v-blur
                         @click="onButtonClick(btn)"
                         :class="btn.class"
+                        size="small"
                         class="ba-table-render-buttons-item"
                         :type="btn.type"
+                        :loading="btn.loading && btn.loading(row, field)"
                         :disabled="btn.disabled && btn.disabled(row, field)"
-                        v-bind="btn.attr"
+                        v-bind="invokeTableContextDataFun(btn.attr, { row, field, cellValue: btn, column, index })"
                     >
-                        <Icon v-if="btn.icon" :name="btn.icon" />
+                        <Icon v-if="btn.icon" size="14" color="var(--ba-bg-color-overlay)" :name="btn.icon" />
                         <div v-if="btn.text" class="text">{{ getTranslation(btn.text) }}</div>
                     </el-button>
                 </el-tooltip>
@@ -43,7 +47,7 @@
                 <el-popconfirm
                     v-if="btn.render == 'confirmButton' && ((btn.name == 'delete' && baTable.auth('del')) || btn.name != 'delete')"
                     :disabled="btn.disabled && btn.disabled(row, field)"
-                    v-bind="btn.popconfirm"
+                    v-bind="invokeTableContextDataFun(btn.popconfirm, { row, field, cellValue: btn, column, index })"
                     @confirm="onButtonClick(btn)"
                 >
                     <template #reference>
@@ -57,12 +61,14 @@
                                 <el-button
                                     v-blur
                                     :class="btn.class"
+                                    size="small"
                                     class="ba-table-render-buttons-item"
                                     :type="btn.type"
+                                    :loading="btn.loading && btn.loading(row, field)"
                                     :disabled="btn.disabled && btn.disabled(row, field)"
-                                    v-bind="btn.attr"
+                                    v-bind="invokeTableContextDataFun(btn.attr, { row, field, cellValue: btn, column, index })"
                                 >
-                                    <Icon v-if="btn.icon" :name="btn.icon" />
+                                    <Icon v-if="btn.icon" size="14" color="var(--ba-bg-color-overlay)" :name="btn.icon" />
                                     <div v-if="btn.text" class="text">{{ getTranslation(btn.text) }}</div>
                                 </el-button>
                             </el-tooltip>
@@ -80,12 +86,14 @@
                 >
                     <el-button
                         :class="btn.class"
+                        size="small"
                         class="ba-table-render-buttons-item move-button"
                         :type="btn.type"
+                        :loading="btn.loading && btn.loading(row, field)"
                         :disabled="btn.disabled && btn.disabled(row, field)"
-                        v-bind="btn.attr"
+                        v-bind="invokeTableContextDataFun(btn.attr, { row, field, cellValue: btn, column, index })"
                     >
-                        <Icon v-if="btn.icon" :name="btn.icon" />
+                        <Icon v-if="btn.icon" size="14" color="var(--ba-bg-color-overlay)" :name="btn.icon" />
                         <div v-if="btn.text" class="text">{{ getTranslation(btn.text) }}</div>
                     </el-button>
                 </el-tooltip>
@@ -128,14 +136,12 @@ const getTranslation = (key?: string) => {
 
 <style scoped lang="scss">
 .ba-table-render-buttons-item {
-    padding: 4px 5px;
-    height: auto;
-    .icon {
-        font-size: 14px !important;
-        color: var(--ba-bg-color-overlay) !important;
-    }
     .text {
         padding-left: 5px;
+    }
+    &.el-button--small {
+        padding: 4px 5px;
+        height: auto;
     }
 }
 .ba-table-render-buttons-move {
