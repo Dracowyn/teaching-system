@@ -1,0 +1,15 @@
+export default {
+    id: 'ID',
+    image: '封面图',
+    title: '标题',
+    type: '分类',
+    top: '上边颜色',
+    bottom: '下边颜色',
+    weigh: '权重',
+    status: '状态',
+    'status 0': '禁用',
+    'status 1': '启用',
+    create_time: '创建时间',
+    update_time: '修改时间',
+    'quick Search Fields': 'ID、标题、分类',
+}
