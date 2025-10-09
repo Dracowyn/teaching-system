@@ -112,10 +112,14 @@ class WsBusiness
         $code     = $response->getCode();
 
         if ($code >= 300) {
-            $content         = $response->getContent();
-            $content         = json_decode($content, true);
-            $content['code'] = $code;
-            $app->send('error', $content);
+            $content     = $response->getContent();
+            $contentJson = json_decode($content, true);
+            $app->send('error', [
+                'code'    => $code,
+                'content' => json_last_error() != JSON_ERROR_NONE ? $contentJson : $content,
+                'data'    => $response->getData(),
+                'header'  => $response->getHeader(),
+            ]);
         }
 
         $http->end($response);
