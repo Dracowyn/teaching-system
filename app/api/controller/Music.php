@@ -5,6 +5,7 @@ namespace app\api\controller;
 use app\common\controller\Frontend;
 use app\common\model\music\Swiper as SwiperModel;
 use app\common\model\music\Daily as DailyModel;
+use app\common\model\music\Recommend as RecommendModel;
 use think\facade\Cache;
 use Throwable;
 
@@ -98,5 +99,47 @@ class Music extends Frontend
 
 		// 返回成功响应
 		$this->success('获取每日推荐成功', $list);
+	}
+
+	/**
+	 * 获取音乐推荐歌单列表
+	 * @return void
+	 * @throws Throwable
+	 */
+	public function recommend(): void
+	{
+		// 定义缓存键名
+		$cacheKey = 'music_recommend_list';
+
+		// 尝试从缓存获取数据
+		$list = Cache::get($cacheKey);
+
+		// 如果缓存中没有数据，则从数据库查询
+		if (!$list) {
+			$recommendModel = new RecommendModel();
+
+			// 查询启用的推荐歌单数据，按权重排序
+			$list = $recommendModel
+				->field(['image', 'title', 'count'])
+				->where('status', 1)
+				->order('weigh', 'desc')
+				->select()
+				->toArray();
+
+			// 处理数据格式
+			foreach ($list as &$item) {
+				$item = [
+					'img'   => get_sys_config('upload_cdn_url') . $item['image'],
+					'title' => $item['title'],
+					'count' => $item['count']
+				];
+			}
+
+			// 将查询结果存入缓存，缓存时间为1小时
+			Cache::set($cacheKey, $list, 3600);
+		}
+
+		// 返回成功响应
+		$this->success('获取推荐歌单成功', $list);
 	}
 }
