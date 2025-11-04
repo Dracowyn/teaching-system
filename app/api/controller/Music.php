@@ -6,6 +6,7 @@ use app\common\controller\Frontend;
 use app\common\model\music\Swiper as SwiperModel;
 use app\common\model\music\Daily as DailyModel;
 use app\common\model\music\Recommend as RecommendModel;
+use app\common\model\music\Songs as SongsModel;
 use think\facade\Cache;
 use Throwable;
 
@@ -141,5 +142,53 @@ class Music extends Frontend
 
 		// 返回成功响应
 		$this->success('获取推荐歌单成功', $list);
+	}
+
+	/**
+	 * 获取歌曲列表
+	 * @return void
+	 * @throws Throwable
+	 */
+	public function songs(): void
+	{
+		// 定义缓存键名
+		$cacheKey = 'music_songs_list';
+
+		// 尝试从缓存获取数据
+		$list = Cache::get($cacheKey);
+
+		// 如果缓存中没有数据，则从数据库查询
+		if (!$list) {
+			$songsModel = new SongsModel();
+
+			// 随机查询15条启用的歌曲数据
+			$list = $songsModel
+				->field(['id', 'image', 'name', 'author', 'file'])
+				->where('status', 1)
+				->orderRaw('RAND()')
+				->limit(15)
+				->select()
+				->toArray();
+
+			// 处理数据格式
+			foreach ($list as &$item) {
+				$item = [
+					'img'    => get_sys_config('upload_cdn_url') . $item['image'],
+					'name'   => $item['name'],
+					'author' => $item['author'],
+					'url'    => get_sys_config('upload_cdn_url') . $item['file'],
+					'id'     => $item['id']
+				];
+			}
+
+			// 将查询结果存入缓存，缓存时间为10分钟
+			Cache::set($cacheKey, $list, 600);
+		}
+
+		// 在返回时打乱数组顺序
+		shuffle($list);
+
+		// 返回成功响应
+		$this->success('歌曲素材仅供学习使用，请勿用于商业用途', data: $list);
 	}
 }
