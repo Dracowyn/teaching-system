@@ -97,23 +97,27 @@ class Manage
 
     /**
      * 下载模块文件
-     * @param string $token   官网会员token
-     * @param int    $orderId 订单号
-     * @return string 下载文件路径
+     * @return string 已下载文件路径
      * @throws Throwable
      */
-    public function download(string $token, int $orderId): string
+    public function download(): string
     {
+        $token   = request()->param("token/s");
+        $version = request()->param('version/s');
+        $orderId = request()->param("orderId/d");
+
         if (!$orderId) {
             throw new Exception('Order not found');
         }
+
         // 下载 - 系统版本号要求、已安装模块的互斥和依赖检测
         $zipFile = Server::download($this->uid, $this->installDir, [
-            'sysVersion'    => Config::get('buildadmin.version'),
+            'version'       => $version,
+            'orderId'       => $orderId,
             'nuxtVersion'   => Server::getNuxtVersion(),
-            'ba-user-token' => $token,
-            'order_id'      => $orderId,
+            'sysVersion'    => Config::get('buildadmin.version'),
             'installed'     => Server::getInstalledIds($this->installDir),
+            'ba-user-token' => $token,
         ]);
 
         // 删除旧版本代码
@@ -169,22 +173,6 @@ class Manage
             throw new Exception('Basic configuration of the Module is incomplete');
         }
 
-        // 安装预检 - 系统版本号要求、已安装模块的互斥和依赖检测
-        try {
-            Server::installPreCheck([
-                'uid'           => $info['uid'],
-                'sysVersion'    => Config::get('buildadmin.version'),
-                'nuxtVersion'   => Server::getNuxtVersion(),
-                'moduleVersion' => $info['version'],
-                'ba-user-token' => $token,
-                'installed'     => Server::getInstalledIds($this->installDir),
-                'server'        => 1,
-            ]);
-        } catch (Throwable $e) {
-            Filesystem::delDir($copyToDir);
-            throw $e;
-        }
-
         $this->uid        = $info['uid'];
         $this->modulesDir = $this->installDir . $info['uid'] . DIRECTORY_SEPARATOR;
 
@@ -198,7 +186,13 @@ class Manage
                 }
                 $nextVersion = implode('.', $versions);
                 $upgrade     = Version::compare($nextVersion, $info['version']);
-                if (!$upgrade) {
+                if ($upgrade) {
+                    // 检查模块是否已禁用
+                    if (!in_array($oldInfo['state'], [self::UNINSTALLED, self::WAIT_INSTALL, self::DISABLE])) {
+                        Filesystem::delDir($copyToDir);
+                        throw new Exception('Please disable the module before updating');
+                    }
+                } else {
                     Filesystem::delDir($copyToDir);
                     // 模块已经存在
                     throw new Exception('Module already exists');
@@ -212,9 +206,26 @@ class Manage
             }
         }
 
+        // 安装预检 - 系统版本号要求、已安装模块的互斥和依赖检测
+        try {
+            Server::installPreCheck([
+                'uid'           => $info['uid'],
+                'version'       => $info['version'],
+                'sysVersion'    => Config::get('buildadmin.version'),
+                'nuxtVersion'   => Server::getNuxtVersion(),
+                'moduleVersion' => $info['version'],
+                'ba-user-token' => $token,
+                'installed'     => Server::getInstalledIds($this->installDir),
+                'server'        => 1,
+            ]);
+        } catch (Throwable $e) {
+            Filesystem::delDir($copyToDir);
+            throw $e;
+        }
+
         $newInfo = ['state' => self::WAIT_INSTALL];
         if ($upgrade) {
-            $newInfo['update'] = 1;
+            $info['update'] = 1;
 
             // 清理旧版本代码
             Filesystem::delDir($this->modulesDir);
@@ -233,40 +244,34 @@ class Manage
     }
 
     /**
-     * 更新
-     * @throws Throwable
-     */
-    public function update(string $token, int $orderId): void
-    {
-        $state = $this->getInstallState();
-        if ($state != self::DISABLE) {
-            throw new Exception('Please disable the module before updating');
-        }
-
-        $this->download($token, $orderId);
-
-        // 标记需要执行更新脚本，并在安装请求执行（当前请求未自动加载到新文件不方便执行）
-        $info           = $this->getInfo();
-        $info['update'] = 1;
-        $this->setInfo([], $info);
-    }
-
-    /**
      * 安装模块
-     * @param string $token   用户token
-     * @param int    $orderId 订单号
      * @return array 模块基本信息
      * @throws Throwable
      */
-    public function install(string $token, int $orderId): array
+    public function install(bool $update): array
     {
         $state = $this->getInstallState();
-        if ($state == self::INSTALLED || $state == self::DIRECTORY_OCCUPIED || $state == self::DISABLE) {
-            throw new Exception('Module already exists');
-        }
 
-        if ($state == self::UNINSTALLED) {
-            $this->download($token, $orderId);
+        if ($update) {
+            if (!in_array($state, [self::UNINSTALLED, self::WAIT_INSTALL, self::DISABLE])) {
+                throw new Exception('Please disable the module before updating');
+            }
+
+            /**
+             * self::WAIT_INSTALL=待安装
+             * 即本地上传文件进行升级的安装流程，文件上传成功后将被标记为待安装，免去此处的下载
+             */
+            if ($state == self::UNINSTALLED || $state != self::WAIT_INSTALL) {
+                $this->download();
+            }
+        } else {
+            if ($state == self::INSTALLED || $state == self::DIRECTORY_OCCUPIED || $state == self::DISABLE) {
+                throw new Exception('Module already exists');
+            }
+
+            if ($state == self::UNINSTALLED) {
+                $this->download();
+            }
         }
 
         // 导入sql
@@ -274,14 +279,16 @@ class Manage
 
         // 如果是更新，先执行更新脚本
         $info = $this->getInfo();
-        if (isset($info['update']) && $info['update']) {
+        if ($update) {
+            $info['update'] = 1;
             Server::execEvent($this->uid, 'update');
-            unset($info['update']);
-            $this->setInfo([], $info);
         }
 
-        // 执行安装脚本
-        Server::execEvent($this->uid, 'install');
+        // 执行安装脚本 - 排除冲突处理时会重复提交至此的请求
+        $extend = request()->post('extend/a', []);
+        if (!isset($extend['conflictHandle'])) {
+            Server::execEvent($this->uid, 'install');
+        }
 
         // 启用插件
         $this->enable('install');
@@ -570,9 +577,6 @@ class Manage
         ]);
 
         if ($update) {
-            $token = request()->post("token/s", '');
-            $order = request()->post("order/d", 0);
-            $this->update($token, $order);
             throw new Exception('update', -3, [
                 'uid' => $this->uid,
             ]);
