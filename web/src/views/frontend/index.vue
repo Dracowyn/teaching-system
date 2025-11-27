@@ -203,7 +203,7 @@ const features = ref([
                     font-weight: 500;
                     margin-bottom: 24px;
                     border: 1px solid rgba(255, 255, 255, 0.2);
-                    animation: pulse 2s ease-in-out infinite;
+                    animation: pulse 3s ease-in-out infinite;
 
                     .badge-icon {
                         color: #ffd700;
@@ -520,12 +520,6 @@ const features = ref([
                 }
             }
         }
-    }
-}
-
-@media screen and (max-height: 650px) {
-    .main-right {
-        display: none !important;
     }
 }
 
