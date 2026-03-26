@@ -2,6 +2,7 @@
 
 namespace app\common\model\wallpaper;
 
+use app\common\library\SnowFlake;
 use think\Model;
 
 /**
@@ -23,7 +24,7 @@ class Banner extends Model
     protected static function onBeforeInsert($model): void
     {
         $pk         = $model->getPk();
-        $model->$pk = \app\common\library\SnowFlake::generateParticle();
+        $model->$pk = SnowFlake::generateParticle();
     }
 
     protected static function onAfterInsert($model): void
