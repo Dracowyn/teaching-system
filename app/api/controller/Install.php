@@ -21,6 +21,10 @@ use app\admin\model\User as UserModel;
  */
 class Install extends Api
 {
+    public const X64 = 'x64';
+
+    public const X86 = 'x86';
+
     protected bool $useSystemSettings = false;
 
     /**
@@ -50,7 +54,7 @@ class Install extends Api
      * 需要的依赖版本
      */
     static array $needDependentVersion = [
-        'php'  => '8.0.2',
+        'php'  => '8.2.0',
         'npm'  => '9.8.1',
         'cnpm' => '7.1.0',
         'node' => '20.14.0',
@@ -119,12 +123,28 @@ class Install extends Api
 
         // php版本-start
         $phpVersion        = phpversion();
+        $phpBit            = PHP_INT_SIZE == 8 ? self::X64 : self::X86;
         $phpVersionCompare = Version::compare(self::$needDependentVersion['php'], $phpVersion);
         if (!$phpVersionCompare) {
             $phpVersionLink = [
                 [
                     // 需要PHP版本
                     'name' => __('need') . ' >= ' . self::$needDependentVersion['php'],
+                    'type' => 'text'
+                ],
+                [
+                    // 如何解决
+                    'name'  => __('How to solve?'),
+                    'title' => __('Click to see how to solve it'),
+                    'type'  => 'faq',
+                    'url'   => 'https://doc.buildadmin.com/guide/install/preparePHP.html'
+                ]
+            ];
+        } elseif ($phpBit != self::X64) {
+            $phpVersionLink = [
+                [
+                    // 需要 64 位 PHP
+                    'name' => __('need') . ' x64 PHP',
                     'type' => 'text'
                 ],
                 [
@@ -232,8 +252,8 @@ class Install extends Api
 
         $this->success('', [
             'php_version'        => [
-                'describe' => $phpVersion,
-                'state'    => $phpVersionCompare ? self::$ok : self::$fail,
+                'describe' => $phpVersion . " ($phpBit)",
+                'state'    => $phpVersionCompare && $phpBit == self::X64 ? self::$ok : self::$fail,
                 'link'     => $phpVersionLink ?? [],
             ],
             'config_is_writable' => [

@@ -41,20 +41,20 @@
                             <el-select :clearable="true" :multiple="true" class="w100" v-model="state.table.quickSearchField" placement="bottom">
                                 <el-option
                                     v-for="(item, idx) in state.fields"
-                                    :key="idx"
+                                    :key="idx + item.uuid!"
                                     :label="item.name + (item.comment ? '-' + item.comment : item.title)"
-                                    :value="item.name"
+                                    :value="item.uuid!"
                                 />
                             </el-select>
                         </el-form-item>
                         <div class="default-sort-field-box">
-                            <el-form-item :label-width="140" class="default-sort-field" :label="t('crud.crud.Table Default Sort Fields')">
+                            <el-form-item :label-width="140" class="default-sort-field mr-20" :label="t('crud.crud.Table Default Sort Fields')">
                                 <el-select :clearable="true" v-model="state.table.defaultSortField" placement="bottom">
                                     <el-option
                                         v-for="(item, idx) in state.fields"
-                                        :key="idx"
+                                        :key="idx + item.uuid!"
                                         :label="item.name + (item.comment ? '-' + item.comment : item.title)"
-                                        :value="item.name"
+                                        :value="item.uuid!"
                                     />
                                 </el-select>
                             </el-form-item>
@@ -72,9 +72,9 @@
                             <el-select :clearable="true" :multiple="true" class="w100" v-model="state.table.columnFields" placement="bottom">
                                 <el-option
                                     v-for="(item, idx) in state.fields"
-                                    :key="idx"
+                                    :key="idx + item.uuid!"
                                     :label="item.name + (item.comment ? '-' + item.comment : item.title)"
-                                    :value="item.name"
+                                    :value="item.uuid!"
                                 />
                             </el-select>
                         </el-form-item>
@@ -82,9 +82,9 @@
                             <el-select :clearable="true" :multiple="true" class="w100" v-model="state.table.formFields" placement="bottom">
                                 <el-option
                                     v-for="(item, idx) in state.fields"
-                                    :key="idx"
+                                    :key="idx + item.uuid!"
                                     :label="item.name + (item.comment ? '-' + item.comment : item.title)"
-                                    :value="item.name"
+                                    :value="item.uuid!"
                                 />
                             </el-select>
                         </el-form-item>
@@ -692,6 +692,7 @@ import FormItem from '/@/components/formItem/index.vue'
 import { useConfig } from '/@/stores/config'
 import { useTerminal } from '/@/stores/terminal'
 import { getArrayKey } from '/@/utils/common'
+import { uuid } from '/@/utils/random'
 import { buildValidatorData, regularVarName } from '/@/utils/validate'
 import { reloadServer } from '/@/utils/vite'
 import type { FieldItem, TableDesignChange, TableDesignChangeType } from '/@/views/backend/crud/index'
@@ -870,6 +871,9 @@ const onFieldDesignTypeChange = (designType: string) => {
     }
     state.fields[state.activateField] = handleFieldAttr(field)
 
+    // 保留字段的 uuid
+    state.fields[state.activateField].uuid = field.uuid
+
     // 询问是否切换至预设方案（除了字段名的属性全部重置）
     ElMessageBox.confirm(t('crud.crud.Reset generate type attr'), t('Reminder'), {
         confirmButtonText: t('Confirm') + t('Reset'),
@@ -881,22 +885,24 @@ const onFieldDesignTypeChange = (designType: string) => {
             // 记录字段属性更新
             onFieldAttrChange()
 
+            // 删除快速搜索和排序，根据新类型重新赋值
+            clearFieldTableData(state.fields[state.activateField].uuid!)
+
             // 重置属性，除了 name
             const oldName = state.fields[state.activateField].name
             state.fields[state.activateField] = handleFieldAttr(fieldDesignData)
             state.fields[state.activateField].name = oldName
 
-            // 删除快速搜索和排序，根据新类型重新赋值
-            clearFieldTableData(oldName)
-
             if (fieldDesignData.primaryKey) {
                 // 设置为默认排序字段、快速搜索字段
-                state.table.defaultSortField = fieldDesignData.name
-                state.table.quickSearchField.push(fieldDesignData.name)
+                state.table.quickSearchField.push(state.fields[state.activateField].uuid!)
+                if (!state.table.defaultSortField) {
+                    state.table.defaultSortField = state.fields[state.activateField].uuid!
+                }
             }
 
             if (fieldDesignData.designType == 'weigh') {
-                state.table.defaultSortField = fieldDesignData.name
+                state.table.defaultSortField = state.fields[state.activateField].uuid!
             }
 
             // 远程下拉参数预填
@@ -906,10 +912,10 @@ const onFieldDesignTypeChange = (designType: string) => {
 
             // 表单表格字段预定义
             if (!fieldDesignData.formBuildExclude) {
-                state.table.formFields.push(fieldDesignData.name)
+                state.table.formFields.push(state.fields[state.activateField].uuid!)
             }
             if (!fieldDesignData.tableBuildExclude) {
-                state.table.columnFields.push(fieldDesignData.name)
+                state.table.columnFields.push(state.fields[state.activateField].uuid!)
             }
         })
         .catch(() => {})
@@ -919,37 +925,14 @@ const onFieldDesignTypeChange = (designType: string) => {
  * 字段名修改
  */
 const onFieldNameChange = (val: string, index: number) => {
-    const nameRepeatKey = getArrayKey(state.fields, 'name', val)
-    if (nameRepeatKey !== false) {
-        // 重命名失败，字段名称重复
-        state.error.fieldNameDuplication = ElMessage({
-            message: t('crud.crud.Rename failed') + '：' + t('crud.crud.Field name duplication', { field: val }),
-            type: 'error',
-        })
-        return
-    }
-
     const oldName = state.fields[index].name
     state.fields[index].name = val
-    for (const key in tableFieldsKey) {
-        for (const idx in state.table[tableFieldsKey[key] as TableKey] as string[]) {
-            if ((state.table[tableFieldsKey[key] as TableKey] as string[])[idx] == oldName) {
-                ;(state.table[tableFieldsKey[key] as TableKey] as string[])[idx] = val
-            }
-        }
-    }
-    if (state.table.defaultSortField && state.table.defaultSortField == oldName) {
-        state.table.defaultSortField = val
-    }
     logTableDesignChange({
         type: 'change-field-name',
         index: state.activateField,
         oldName: oldName,
         newName: val,
     })
-
-    fieldNameCheck('ElMessage')
-    fieldNameDuplicationCheck('ElMessage')
 }
 
 /**
@@ -1053,14 +1036,14 @@ const onFieldAttrChange = () => {
 /**
  * 从 state.table.* 清理某个字段的数据
  */
-const clearFieldTableData = (name: string) => {
-    if (name == state.table.defaultSortField) {
+const clearFieldTableData = (uuid: string) => {
+    if (uuid == state.table.defaultSortField) {
         state.table.defaultSortField = ''
     }
 
     for (const key in tableFieldsKey) {
         const delIdx = (state.table[tableFieldsKey[key] as TableKey] as string[]).findIndex((item) => {
-            return item == name
+            return item == uuid
         })
         if (delIdx != -1) {
             ;(state.table[tableFieldsKey[key] as TableKey] as string[]).splice(delIdx, 1)
@@ -1072,7 +1055,7 @@ const onDelField = (index: number) => {
     if (!state.fields[index]) return
     state.activateField = -1
 
-    clearFieldTableData(state.fields[index].name)
+    clearFieldTableData(state.fields[index].uuid!)
 
     logTableDesignChange({
         type: 'del-field',
@@ -1080,10 +1063,17 @@ const onDelField = (index: number) => {
         newName: '',
     })
 
-    state.fields.splice(index, 1)
+    // 删除权重字段时，重设默认排序字段
+    if (state.fields[index].designType == 'weigh') {
+        const pkField = state.fields.find((item) => {
+            return ['pk', 'spk'].includes(item.designType)
+        })
+        if (pkField) {
+            state.table.defaultSortField = pkField.uuid!
+        }
+    }
 
-    fieldNameCheck('ElMessage')
-    fieldNameDuplicationCheck('ElMessage')
+    state.fields.splice(index, 1)
 }
 
 const showRemoteSelectPre = (index: number, hideDelField = false) => {
@@ -1130,6 +1120,8 @@ const closeConfirmGenerate = () => {
 
 const startGenerate = () => {
     state.loading.generate = true
+
+    // 简化设计字段数据
     const fields = cloneDeep(state.fields)
     for (const key in fields) {
         for (const tKey in fields[key].table) {
@@ -1139,10 +1131,32 @@ const startGenerate = () => {
             fields[key].form[tKey] = fields[key].form[tKey].value
         }
     }
+
+    // 通过 uuid 获取字段 name
+    const table = cloneDeep(state.table)
+    if (table.defaultSortField) {
+        const defaultSortFieldIndex = getArrayKey(state.fields, 'uuid', table.defaultSortField)
+        if (defaultSortFieldIndex !== false) {
+            table.defaultSortField = state.fields[defaultSortFieldIndex].name
+        }
+    }
+    for (const key in tableFieldsKey) {
+        const names: string[] = []
+        const uuids = table[tableFieldsKey[key] as TableKey] as string[]
+        for (const uKey in uuids) {
+            const uuidFieldIndex = getArrayKey(state.fields, 'uuid', uuids[uKey])
+            if (uuidFieldIndex !== false) {
+                names.push(state.fields[uuidFieldIndex].name)
+            }
+        }
+
+        ;(table[tableFieldsKey[key] as TableKey] as string[]) = names
+    }
+
     generate({
         type: crudState.type,
-        table: state.table,
-        fields: fields,
+        table,
+        fields,
     })
         .then((res) => {
             const callback = () => {
@@ -1276,6 +1290,7 @@ interface SortableEvt extends SortableEvent {
  * 处理字段的属性
  */
 const handleFieldAttr = (field: FieldItem) => {
+    field = cloneDeep(field)
     const designTypeAttr = cloneDeep(designTypes[field.designType])
     for (const tKey in field.form) {
         if (designTypeAttr.form[tKey]) designTypeAttr.form[tKey].value = field.form[tKey]
@@ -1288,6 +1303,7 @@ const handleFieldAttr = (field: FieldItem) => {
     }
     field.form = designTypeAttr.form
     field.table = designTypeAttr.table
+    field.uuid = uuid()
     return field
 }
 
@@ -1333,17 +1349,10 @@ const loadData = () => {
     if (crudState.type == 'log') {
         postLogStart(crudState.startData.logId, crudState.startData.logType)
             .then((res) => {
-                state.sync = res.data.sync
-                state.table = res.data.table
-                tableDesignChangeInit()
-                if (res.data.table.empty) {
-                    state.table.rebuild = 'Yes'
-                }
-                state.table.isCommonModel = parseInt(res.data.table.isCommonModel)
-                state.table.databaseConnection = res.data.table.databaseConnection ? res.data.table.databaseConnection : ''
+                // 字段数据
                 const fields = res.data.fields
                 for (const key in fields) {
-                    const field = handleFieldAttr(cloneDeep(fields[key]))
+                    const field = handleFieldAttr(fields[key])
 
                     // 默认值和默认值类型分析
                     if (typeof field.defaultType == 'undefined') {
@@ -1357,6 +1366,35 @@ const loadData = () => {
 
                     state.fields.push(field)
                 }
+
+                // 表数据
+                if (res.data.table.defaultSortField) {
+                    const defaultSortFieldNameIndex = getArrayKey(state.fields, 'name', res.data.table.defaultSortField)
+                    if (defaultSortFieldNameIndex !== false) {
+                        res.data.table.defaultSortField = state.fields[defaultSortFieldNameIndex].uuid!
+                    }
+                }
+                for (const key in tableFieldsKey) {
+                    const uuids: string[] = []
+                    const names = res.data.table[tableFieldsKey[key] as TableKey] as string[]
+                    for (const nKey in names) {
+                        const nameFieldIndex = getArrayKey(state.fields, 'name', names[nKey])
+                        if (nameFieldIndex !== false) {
+                            uuids.push(state.fields[nameFieldIndex].uuid!)
+                        }
+                    }
+
+                    ;(res.data.table[tableFieldsKey[key] as TableKey] as string[]) = uuids
+                }
+
+                state.sync = res.data.sync
+                state.table = res.data.table
+                tableDesignChangeInit()
+                if (res.data.table.empty) {
+                    state.table.rebuild = 'Yes'
+                }
+                state.table.isCommonModel = parseInt(res.data.table.isCommonModel)
+                state.table.databaseConnection = res.data.table.databaseConnection ? res.data.table.databaseConnection : ''
             })
             .finally(() => {
                 state.loading.init = false
@@ -1376,17 +1414,17 @@ const loadData = () => {
             for (const key in res.data.columns) {
                 const field = handleFieldAttr(res.data.columns[key])
                 if (!['id', 'update_time', 'create_time', 'updatetime', 'createtime'].includes(field.name)) {
-                    state.table.formFields.push(field.name)
+                    state.table.formFields.push(field.uuid!)
                 }
                 if (!['textarea', 'file', 'files', 'editor', 'password', 'array'].includes(field.designType)) {
-                    state.table.columnFields.push(field.name)
+                    state.table.columnFields.push(field.uuid!)
                 }
                 if (field.designType == 'pk') {
-                    state.table.defaultSortField = field.name
-                    state.table.quickSearchField.push(field.name)
+                    state.table.defaultSortField = field.uuid!
+                    state.table.quickSearchField.push(field.uuid!)
                 }
                 if (field.designType == 'weigh') {
-                    state.table.defaultSortField = field.name
+                    state.table.defaultSortField = field.uuid!
                 }
                 fields.push(field)
             }
@@ -1430,14 +1468,16 @@ onMounted(() => {
             const name = evt.originalEvent?.dataTransfer?.getData('name')
             const field = fieldItem[name as keyof typeof fieldItem]
             if (field && field[evt.oldIndex!]) {
-                const data = handleFieldAttr(cloneDeep(field[evt.oldIndex!]))
+                const data = handleFieldAttr(field[evt.oldIndex!])
 
                 // 主键重复检测
                 if (data.primaryKey) {
                     if (primaryKeyRepeatCheck(data)) {
                         // 设置为默认排序字段、快速搜索字段
-                        state.table.defaultSortField = data.name
-                        state.table.quickSearchField.push(data.name)
+                        state.table.quickSearchField.push(data.uuid!)
+                        if (!state.table.defaultSortField) {
+                            state.table.defaultSortField = data.uuid!
+                        }
                     } else {
                         return evt.item.remove()
                     }
@@ -1445,7 +1485,7 @@ onMounted(() => {
 
                 // 出现权重字段则以其排序
                 if (data.designType == 'weigh') {
-                    state.table.defaultSortField = data.name
+                    state.table.defaultSortField = data.uuid!
                 }
 
                 // name 重复时，自动重命名
@@ -1469,10 +1509,10 @@ onMounted(() => {
 
                 // 表单表格字段预定义
                 if (!data.formBuildExclude) {
-                    state.table.formFields.push(data.name)
+                    state.table.formFields.push(data.uuid!)
                 }
                 if (!data.tableBuildExclude) {
-                    state.table.columnFields.push(data.name)
+                    state.table.columnFields.push(data.uuid!)
                 }
             }
             evt.item.remove()
@@ -1715,16 +1755,19 @@ const logTableDesignChange = (data: TableDesignChange) => {
         state.table.designChange = state.table.designChange.filter((item) => {
             // 新增的字段被删除
             add = item.type == 'add-field' && item.newName == data.oldName
-            // 有改名记录的字段被删除
-            const name = item.type == 'change-field-name' && item.newName == data.oldName
             // 有属性修改记录的字段被删除
             const attr = item.type == 'change-field-attr' && item.oldName == data.oldName
             // 有排序记录的字段被删除
             const order = item.type == 'change-field-order' && item.oldName == data.oldName
 
-            if (name) data.oldName = item.oldName
+            return !add && !attr && !order
+        })
 
-            return !add && !name && !attr && !order
+        // 有改名记录的字段被删除（延后单独处理避免先改名再改属性的情况）
+        state.table.designChange = state.table.designChange.filter((item) => {
+            const name = item.type == 'change-field-name' && item.newName == data.oldName
+            if (name) data.oldName = item.oldName
+            return !name
         })
 
         // 添加的字段需要过滤掉记录同时不记录删除操作

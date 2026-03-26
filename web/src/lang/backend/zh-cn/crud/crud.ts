@@ -3,6 +3,9 @@ export default {
     width: '表格列宽度',
     sortable: '字段排序',
     operator: '公共搜索操作符',
+    comSearchRender: '公共搜索输入框渲染方案',
+    comSearchInputAttr: '公共搜索输入框扩展属性',
+    comSearchInputAttrTip: '格式如：size=large，一行一个属性，远程下拉的公共搜索也渲染为远程下拉时，此处免填远程下拉组件的必填属性',
     render: '渲染方案',
     timeFormat: '格式化方式',
     step: '步进值',
@@ -29,6 +32,7 @@ export default {
     'Are you sure to delete the generated CRUD code?': '确认删除生成的 CRUD 代码？',
     start: '开始',
     create: '新建',
+    or: '或',
     'New background CRUD from zero': '从零新建后台 CRUD',
     'Select Data Table': '选择数据表',
     'Select a designed data table from the database': '从数据库中选择一个设计好的数据表',
@@ -45,7 +49,7 @@ export default {
     'experience 1 3': '（站点端口为：1818）',
     'experience 2 1': '在本页点击',
     'experience 2 2': '选择数据表',
-    'experience 2 3': '，并选择',
+    'experience 2 3': '（可选择 test_build 数据表）',
     'experience 3 1': '点击',
     'experience 3 2': '生成 CRUD 代码',
     'experience 3 3': '，点击',
@@ -128,7 +132,7 @@ export default {
         '控制器已经存在，继续生成将自动覆盖已有代码！',
     'The menu rule with the same name already exists The menu and permission node will not be created in this generation':
         '同名菜单规则已经存在，本次生成将不会创建菜单和权限节点！',
-    'For example: `user table` will be generated into `user management`': '如：`会员表`将生成为`会员管理`',
+    'For example: `user table` will be generated into `user management`': '如：会员表（将生成为会员管理）',
     'The remote pull-down will request the corresponding controller to obtain data, so it is recommended that you create the CRUD of the associated table':
         '远程下拉将请求该控制器的 index 方法来获取 value 和 label 字段数据，所以请先生成好被关联表的CRUD',
     'If it is left blank, the model of the associated table will be generated automatically If the table already has a model, it is recommended to select it to avoid repeated generation':
@@ -156,7 +160,6 @@ export default {
     No: '否',
     'If the data is abnormal, repeat the previous step': '数据异常，请重做上步操作',
     'Field name duplication': '字段名称 {field} 重复！',
-    'Rename failed': '重命名失败',
     'Design remote select tips':
         '将自动根据表名生成本字段的名称；确认生成时，字段名 user_id 生成的关联方法名为 user，字段名 developer_done_id 生成的关联方法名为 developerDone，请注意远程下拉字段的名称前缀不要重复',
     'Vite hot warning': '未找到 Vite 热更新服务，请在开发环境生成代码，或点击右上角的WEB终端重新发布',

@@ -6,6 +6,7 @@ use Throwable;
 use ba\Depends;
 use ba\Exception;
 use ba\Filesystem;
+use PhpZip\ZipFile;
 use think\facade\Db;
 use FilesystemIterator;
 use think\facade\Config;
@@ -331,7 +332,7 @@ class Server
         return true;
     }
 
-    public static function getClass(string $uid, string $type = 'event', string $class = null): string
+    public static function getClass(string $uid, string $type = 'event', ?string $class = null): string
     {
         $name = parse_name($uid);
         if (!is_null($class) && strpos($class, '.')) {
@@ -546,7 +547,7 @@ class Server
     /**
      * 创建 .runtime
      */
-    public static function createRuntime(string $dir): void
+    public static function createRuntime(string $dir, array $extend = []): void
     {
         $runtimeFilePath = $dir . '.runtime';
         $files           = new RecursiveIteratorIterator(
@@ -565,10 +566,10 @@ class Server
             }
         }
 
-        file_put_contents($runtimeFilePath, json_encode([
+        file_put_contents($runtimeFilePath, json_encode(array_merge([
             'files' => $filePaths,
             'pure'  => Config::get('buildadmin.module_pure_install'),
-        ]));
+        ], $extend)));
     }
 
     /**
@@ -586,5 +587,23 @@ class Server
         } else {
             return $runtimeContentArr;
         }
+    }
+
+    /**
+     * @throws Throwable
+     */
+    public static function getModulePackageComment(string $file): string
+    {
+        $zip = new ZipFile();
+        try {
+            $zip->openFile($file);
+            $moduleComment = $zip->getArchiveComment();
+        } catch (Throwable) {
+            $zip->close();
+            throw new Exception('Unable to open the zip file');
+        } finally {
+            $zip->close();
+        }
+        return $moduleComment ?: '';
     }
 }

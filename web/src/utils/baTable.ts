@@ -133,7 +133,7 @@ export default class baTable {
     postDel = (ids: string[]) => {
         if (this.runBefore('postDel', { ids }) === false) return
         this.api.del(ids).then((res) => {
-            this.onTableHeaderAction('refresh', {})
+            this.onTableHeaderAction('refresh', { event: 'delete', ids })
             this.runAfter('postDel', { res })
         })
     }
@@ -215,7 +215,7 @@ export default class baTable {
             this.api
                 .postData(operate, this.form.items!)
                 .then((res) => {
-                    this.onTableHeaderAction('refresh', {})
+                    this.onTableHeaderAction('refresh', { event: 'submit', operate, items: this.form.items })
                     this.form.operateIds?.shift()
                     if (this.form.operateIds!.length > 0) {
                         this.toggleForm('Edit', this.form.operateIds)
@@ -254,10 +254,10 @@ export default class baTable {
 
     /**
      * 表格内的事件统一响应
-     * @param event 事件:selection-change=选中项改变,page-size-change=每页数量改变,current-page-change=翻页,sort-change=排序,edit=编辑,delete=删除,field-change=单元格值改变,com-search=公共搜索
+     * @param event 事件名称，含义请参考其类型定义
      * @param data 携带数据
      */
-    onTableAction = (event: string, data: anyObj) => {
+    onTableAction = (event: BaTableActionEventName, data: anyObj) => {
         if (this.runBefore('onTableAction', { event, data }) === false) return
         const actionFun = new Map([
             [
@@ -316,7 +316,8 @@ export default class baTable {
             [
                 'com-search',
                 () => {
-                    this.table.filter!.search = this.getComSearchData()
+                    // 主动触发公共搜索，采用覆盖模式设定请求筛选数据
+                    this.setFilterSearchData(this.getComSearchData(), 'cover')
 
                     // 刷新表格
                     this.onTableHeaderAction('refresh', { event: 'com-search', data: this.table.filter!.search })
@@ -337,10 +338,10 @@ export default class baTable {
 
     /**
      * 表格顶栏按钮事件统一响应
-     * @param event 事件:refresh=刷新,edit=编辑,delete=删除,quick-search=快速查询,unfold=折叠/展开,change-show-column=调整列显示状态
+     * @param event 事件名称，含义参考其类型定义
      * @param data 携带数据
      */
-    onTableHeaderAction = (event: string, data: anyObj) => {
+    onTableHeaderAction = (event: BaTableHeaderActionEventName, data: anyObj) => {
         if (this.runBefore('onTableHeaderAction', { event, data }) === false) return
         const actionFun = new Map([
             [
@@ -458,8 +459,15 @@ export default class baTable {
                 const moveRow = findIndexRow(this.table.data!, evt.oldIndex) as TableRow
                 const targetRow = findIndexRow(this.table.data!, evt.newIndex) as TableRow
 
+                const eventData = {
+                    move: moveRow[this.table.pk!],
+                    target: targetRow[this.table.pk!],
+                    order: this.table.filter?.order,
+                    direction: evt.newIndex > evt.oldIndex ? 'down' : 'up',
+                }
+
                 if (this.table.dragSortLimitField && moveRow[this.table.dragSortLimitField] != targetRow[this.table.dragSortLimitField]) {
-                    this.onTableHeaderAction('refresh', {})
+                    this.onTableHeaderAction('refresh', { event: 'sort', ...eventData })
                     ElNotification({
                         type: 'error',
                         message: i18n.global.t('utils.The moving position is beyond the movable range!'),
@@ -467,16 +475,9 @@ export default class baTable {
                     return
                 }
 
-                this.api
-                    .sortable({
-                        move: moveRow[this.table.pk!],
-                        target: targetRow[this.table.pk!],
-                        order: this.table.filter?.order,
-                        direction: evt.newIndex > evt.oldIndex ? 'down' : 'up',
-                    })
-                    .finally(() => {
-                        this.onTableHeaderAction('refresh', {})
-                    })
+                this.api.sortable(eventData).finally(() => {
+                    this.onTableHeaderAction('refresh', { event: 'sort', ...eventData })
+                })
             },
         })
     }
@@ -491,15 +492,17 @@ export default class baTable {
         const route = useRoute()
         this.table.routePath = route.fullPath
 
-        // 初始化公共搜索表单数据和字段 Map
-        this.initComSearch()
+        // 按需初始化公共搜索表单数据和字段Map
+        if (this.comSearch.fieldData.size === 0) {
+            this.initComSearch()
+        }
 
         if (this.table.acceptQuery && !isEmpty(route.query)) {
             // 根据当前 URL 的 query 初始化公共搜索默认值
             this.setComSearchData(route.query)
 
             // 获取公共搜索数据合并至表格筛选条件
-            this.table.filter!.search = this.getComSearchData().concat(this.table.filter?.search ?? [])
+            this.setFilterSearchData(this.getComSearchData(), 'merge')
         }
     }
 
@@ -550,9 +553,14 @@ export default class baTable {
     }
 
     /**
-     * 设置公共搜索数据
+     * 设置公共搜索表单数据
      */
     setComSearchData = (query: anyObj) => {
+        // 必需已经完成公共搜索数据的初始化
+        if (this.comSearch.fieldData.size === 0) {
+            this.initComSearch()
+        }
+
         for (const key in this.table.column) {
             const prop = this.table.column[key].prop
             if (prop && typeof query[prop] !== 'undefined') {
@@ -572,6 +580,10 @@ export default class baTable {
                                     ]
                                 }
                             }
+                        }
+                    } else if (this.table.column[key].comSearchRender == 'time') {
+                        if (range && range.length >= 2) {
+                            this.comSearch.form[prop] = [range[0], range[1]]
                         }
                     } else {
                         this.comSearch.form[prop + '-start'] = range[0] ?? ''
@@ -594,22 +606,31 @@ export default class baTable {
     }
 
     /**
-     * 获取公共搜索数据
+     * 获取公共搜索表单数据
      */
     getComSearchData = () => {
-        const comSearchData: comSearchData[] = []
+        // 必需已经完成公共搜索数据的初始化
+        if (this.comSearch.fieldData.size === 0) {
+            this.initComSearch()
+        }
+
+        const comSearchData: ComSearchData[] = []
 
         for (const key in this.comSearch.form) {
             if (!this.comSearch.fieldData.has(key)) continue
 
             let val = null
             const fieldDataTemp = this.comSearch.fieldData.get(key)
-            if (fieldDataTemp.render == 'datetime' && (fieldDataTemp.operator == 'RANGE' || fieldDataTemp.operator == 'NOT RANGE')) {
-                // 时间范围
+            if (
+                (fieldDataTemp.render == 'datetime' || ['datetime', 'date', 'time'].includes(fieldDataTemp.comSearchRender)) &&
+                (fieldDataTemp.operator == 'RANGE' || fieldDataTemp.operator == 'NOT RANGE')
+            ) {
                 if (this.comSearch.form[key] && this.comSearch.form[key].length >= 2) {
+                    // 日期范围
                     if (fieldDataTemp.comSearchRender == 'date') {
                         val = this.comSearch.form[key][0] + ' 00:00:00' + ',' + this.comSearch.form[key][1] + ' 23:59:59'
                     } else {
+                        // 时间范围、时间日期范围
                         val = this.comSearch.form[key][0] + ',' + this.comSearch.form[key][1]
                     }
                 }
@@ -635,6 +656,26 @@ export default class baTable {
         }
 
         return comSearchData
+    }
+
+    /**
+     * 设置 getData 请求时的过滤条件（搜索数据）
+     * @param search 新的搜索数据
+     * @param mode 模式:cover=覆盖到已有搜索数据,merge=合并到已有搜索数据
+     */
+    setFilterSearchData = (search: ComSearchData[], mode: 'cover' | 'merge' = 'merge') => {
+        if (mode == 'cover' || !this.table.filter?.search) {
+            this.table.filter!.search = search
+        } else {
+            const merged = this.table.filter!.search.concat(search)
+            const fieldMap = new Map<string, ComSearchData>()
+
+            merged.forEach((item) => {
+                fieldMap.set(item.field, item)
+            })
+
+            this.table.filter!.search = Array.from(fieldMap.values())
+        }
     }
 
     // 方法别名
