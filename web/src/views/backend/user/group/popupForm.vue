@@ -77,7 +77,7 @@ import { useI18n } from 'vue-i18n'
 import type baTableClass from '/@/utils/baTable'
 import type { ElTree, FormItemRule } from 'element-plus'
 import FormItem from '/@/components/formItem/index.vue'
-import type Node from 'element-plus/es/components/tree/src/model/node'
+import type { Node } from 'element-plus/es/components/tree/src/model/node'
 import { buildValidatorData } from '/@/utils/validate'
 import { useConfig } from '/@/stores/config'
 
