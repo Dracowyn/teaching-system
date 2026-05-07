@@ -25,4 +25,18 @@ class Helper
             $data      = self::$xss->xss_clean($data);
         }
     }
+
+    /**
+     * 清除 apc、op 缓存
+     */
+    public static function cleanRuntimeCache(): void
+    {
+        if (extension_loaded('apc')) {
+            apc_clear_cache();
+        }
+
+        if (extension_loaded('Zend OPcache')) {
+            opcache_reset();
+        }
+    }
 }

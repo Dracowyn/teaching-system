@@ -2,14 +2,14 @@
 
 namespace app\worker\events;
 
+use Throwable;
 use ba\Filesystem;
 use Workerman\Timer;
-use think\facade\Db;
-use think\facade\App;
 use Workerman\Worker;
 use think\facade\Config;
+use app\ExceptionHandle;
+use app\worker\library\Helper;
 use app\worker\library\Monitor;
-use think\db\exception\PDOException;
 use app\worker\library\WorkerHttpApp;
 use Workerman\Protocols\Http\Request;
 use Workerman\Protocols\Http\Response;
@@ -33,14 +33,9 @@ class Http
     protected static int $waitResponseCount = 0;
 
     /**
-     * 初始 $_SERVER 数据
+     * WorkerMan Http APP 类
      */
-    protected static array $serverData;
-
-    /**
-     * 需要绑定到 app 的类实例
-     */
-    protected static array $bind = [];
+    protected WorkerHttpApp $app;
 
     /**
      * 构造函数
@@ -55,23 +50,17 @@ class Http
      */
     public function onWorkerStart(Worker $worker): void
     {
-        self::$bind['worker'] = $worker;
-        self::$serverData     = $_SERVER;
+        Helper::cleanRuntimeCache();
+
+        $this->app          = new WorkerHttpApp(root_path());
+        $this->app->worker  = $worker;
+        $this->app->servers = $_SERVER;
+        $this->app->initialize();
+        $this->app->cloneInstance();
 
         // 文件监听配置
         if (!self::$monitorConfig) {
             self::$monitorConfig = Config::get('worker_monitor');
-        }
-
-        // 初始化 Db 类单例，并在所有进程中共用
-        if (!isset(self::$bind['db'])) {
-            try {
-                Db::execute("SELECT 1");
-                $app                 = App::getInstance();
-                self::$bind['db']    = $app->db;
-                self::$bind['cache'] = $app->cache;
-            } catch (PDOException) {
-            }
         }
 
         if (0 == $worker->id) {
@@ -84,11 +73,7 @@ class Http
      */
     public function onMessage(TcpConnection $connection, Request $request): void
     {
-        $app = new WorkerHttpApp(root_path());
-        foreach (self::$bind as $key => $item) {
-            $app->$key = $item;
-        }
-        $app->init($connection, $request, self::$serverData);
+        $this->app->init($connection, $request);
 
         $path = $request->path() ?: '/';
         $file = Filesystem::fsFit(public_path() . urldecode($path));
@@ -101,23 +86,28 @@ class Http
                 Monitor::pause();
             }
 
-            // 避免输出到命令行窗口
-            while (ob_get_level() > 1) {
-                ob_end_clean();
+            try {
+                $level = ob_get_level();
+                ob_start();
+
+                $response = $this->app->http->run();
+
+                if (ob_get_length() > 0) {
+                    $content = $response->getContent();
+                    $response->content(ob_get_contents() . $content);
+                }
+
+                while (ob_get_level() > $level) {
+                    ob_end_clean();
+                }
+            } catch (Throwable $e) {
+                $handle = $this->app->make(ExceptionHandle::class);
+                $handle->report($e);
+                $response = $handle->render($this->app->request, $e);
             }
 
-            ob_start();
-
-            $http     = $app->http;
-            $response = $http->run();
-            $content  = ob_get_clean();
-
-            ob_start();
-            $response->send();
-            $app->http->end($response);
-            $content .= ob_get_clean() ?: '';
-
-            $connection->send(new Response($response->getCode(), $response->getHeader(), $content));
+            $connection->send(new Response($response->getCode(), $response->getHeader(), $response->getContent()));
+            $this->app->http->end($response);
 
             self::$waitResponseCount--;
             if (self::$waitResponseCount <= 0 && self::$monitorConfig['soft_reboot']) {

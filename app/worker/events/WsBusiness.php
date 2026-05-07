@@ -2,14 +2,11 @@
 
 namespace app\worker\events;
 
-use think\facade\Db;
-use think\facade\App;
 use think\facade\Config;
 use app\worker\library\Monitor;
 use GatewayWorker\BusinessWorker;
 use app\worker\library\WorkerWsApp;
 use app\admin\library\module\Server;
-use think\db\exception\PDOException;
 
 /**
  * ws的业务(Business)进程回调类
@@ -17,37 +14,26 @@ use think\db\exception\PDOException;
 class WsBusiness
 {
     /**
+     * WorkerMan Ws APP 类
+     */
+    protected static WorkerWsApp $app;
+
+    /**
      * 文件监听配置
      */
     protected static array $monitorConfig = [];
-
-    /**
-     * 初始 $_SERVER 数据
-     */
-    protected static array $serverData;
-
-    protected static ?\think\Db $db = null;
-
-    protected static BusinessWorker $worker;
 
     /**
      * Worker子进程启动时的回调函数，每个子进程启动时都会执行。
      */
     public static function onWorkerStart(BusinessWorker $worker): void
     {
-        self::$worker = $worker;
-        if (!self::$monitorConfig) {
-            self::$monitorConfig = Config::get('worker_monitor');
-        }
+        self::$app         = new WorkerWsApp(root_path());
+        self::$app->worker = $worker;
+        self::$app->initialize();
+        self::$app->cloneInstance();
 
-        if (!self::$db) {
-            try {
-                Db::execute("SELECT 1");
-                $app      = App::getInstance();
-                self::$db = $app->db;
-            } catch (PDOException) {
-            }
-        }
+        self::$monitorConfig = Config::get('worker_monitor');
 
         if (0 == $worker->id) {
             new Monitor(self::$monitorConfig);
@@ -69,12 +55,12 @@ class WsBusiness
      * WebSocket 链接成功
      *
      * @param string $clientId 连接id
-     * @param array  $data     websocket握手时的http头数据，包含get、server等变量
+     * @param array  $data     websocket 握手时的 http 头数据，包含 get、server 等变量
      */
     public static function onWebSocketConnect(string $clientId, array $data): void
     {
-        self::$serverData        = $_SERVER;
-        $_SESSION['requestData'] = $data;
+        self::$app->servers     = $_SERVER;
+        self::$app->requestData = $data;
 
         self::callModuleEvent('onWebSocketConnect', [
             'clientId' => $clientId,
@@ -89,32 +75,28 @@ class WsBusiness
      */
     public static function onMessage(string $clientId, mixed $message): bool
     {
-        if ($message == 'ping') return true;
+        if ($message == 'ping') {
+            return true;
+        }
 
-        $app              = new WorkerWsApp(root_path());
-        $app->db          = self::$db;
-        $app->worker      = self::$worker;
-        $app->clientId    = $clientId;
-        $app->requestData = $_SESSION['requestData'] ?? [];
-
-        $app->message = json_decode($message, true);
+        self::$app->clientId = $clientId;
+        self::$app->message  = json_decode($message, true);
         if (json_last_error() != JSON_ERROR_NONE) {
-            return $app->send('error', [
+            return self::$app->send('error', [
                 'message' => 'Message parsing error:' . json_last_error_msg(),
                 'code'    => 500,
             ]);
         }
 
-        $app->init(self::$serverData ?? []);
+        self::$app->init();
 
-        $http     = $app->http;
-        $response = $http->run();
+        $response = self::$app->http->run();
         $code     = $response->getCode();
 
         if ($code >= 300) {
             $content     = $response->getContent();
             $contentJson = json_decode($content, true);
-            $app->send('error', [
+            self::$app->send('error', [
                 'code'    => $code,
                 'content' => json_last_error() != JSON_ERROR_NONE ? $contentJson : $content,
                 'data'    => $response->getData(),
@@ -122,7 +104,7 @@ class WsBusiness
             ]);
         }
 
-        $http->end($response);
+        self::$app->http->end($response);
         return true;
     }
 
