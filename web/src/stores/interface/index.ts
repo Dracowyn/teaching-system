@@ -23,8 +23,6 @@ export interface Layout {
     menuCollapse: boolean
     // 是否只保持一个子菜单的展开（手风琴）
     menuUniqueOpened: boolean
-    // 显示菜单栏顶栏（LOGO）
-    menuShowTopBar: boolean
     // 侧边菜单背景色
     menuBackground: string[]
     // 侧边菜单文字颜色
@@ -35,8 +33,20 @@ export interface Layout {
     menuActiveColor: string[]
     // 侧边菜单悬停时背景色
     menuHoverBackground: string[]
+    // 显示菜单栏顶栏（站点标题栏）
+    menuShowTopBar: boolean
     // 侧边菜单顶栏背景色
     menuTopBarBackground: string[]
+    // 侧边菜单顶栏文字颜色
+    menuTopBarColor: string[]
+    // 侧边菜单顶栏内容居中
+    menuTopBarCenter: boolean
+    // 侧边菜单顶栏显示LOGO
+    menuTopBarLogo: boolean
+    // 侧边菜单底部工具栏自动隐藏
+    menuToolBarAutoHide: boolean
+    // 侧边菜单底部工具栏图标颜色
+    menuToolBarColor: string[]
     /* 侧边栏 - e */
 
     /* 顶栏 - s */
@@ -51,6 +61,13 @@ export interface Layout {
     // 顶栏激活项文字色
     headerBarTabActiveColor: string[]
     /* 顶栏 - e */
+
+    /* tour - s */
+    // 布局漫游式引导显示状态
+    layoutTour: boolean
+    // 布局漫游式引导未完成标记
+    layoutTourUnfinished: boolean
+    /* tour - e */
 }
 
 export interface Lang {

@@ -20,12 +20,17 @@ export const useConfig = defineStore(
             menuActiveBackground: ['#ffffff', '#1d1e1f'],
             menuActiveColor: ['#409eff', '#3375b9'],
             menuHoverBackground: ['#ecf5ff', '#18222c'],
-            menuTopBarBackground: ['#fcfcfc', '#1d1e1f'],
             menuWidth: 260,
             menuDefaultIcon: 'fa fa-circle-o',
             menuCollapse: false,
             menuUniqueOpened: false,
             menuShowTopBar: true,
+            menuTopBarBackground: ['#fcfcfc', '#1d1e1f'],
+            menuTopBarColor: ['#409eff', '#3375b9'],
+            menuTopBarCenter: false,
+            menuTopBarLogo: false,
+            menuToolBarAutoHide: false,
+            menuToolBarColor: ['#303133', '#CFD3DC'],
 
             // 顶栏
             headerBarTabColor: ['#000000', '#CFD3DC'],
@@ -33,6 +38,11 @@ export const useConfig = defineStore(
             headerBarTabActiveColor: ['#000000', '#409EFF'],
             headerBarBackground: ['#ffffff', '#1d1e1f'],
             headerBarHoverBackground: ['#f5f5f5', '#18222c'],
+
+            // tour
+            // 布局漫游式引导
+            layoutTour: false,
+            layoutTourUnfinished: true,
         })
 
         const lang: Lang = reactive({
