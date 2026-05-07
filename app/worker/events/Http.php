@@ -6,6 +6,7 @@ use Throwable;
 use ba\Filesystem;
 use Workerman\Timer;
 use Workerman\Worker;
+use think\facade\Db;
 use think\facade\Config;
 use app\ExceptionHandle;
 use app\worker\library\Helper;
@@ -66,6 +67,17 @@ class Http
         if (0 == $worker->id) {
             new Monitor(self::$monitorConfig);
         }
+
+        // MySQL 连接保活：长驻进程下若空闲过久，连接会被 wait_timeout 或中间网络设备静默断开，
+        // 之后的查询会无限阻塞导致 worker [busy]。每 30 秒主动 ping 一次，让 break_reconnect 在
+        // 用户请求到达之前完成重连。
+        Timer::add(30, function () {
+            try {
+                Db::execute('SELECT 1');
+            } catch (Throwable) {
+                // break_reconnect 已在 PDOConnection 内部处理，吞掉异常即可
+            }
+        });
     }
 
     /**

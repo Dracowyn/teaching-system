@@ -34,7 +34,13 @@ return [
             // 端口
             'hostport'        => env('database.hostport', '3306'),
             // 数据库连接参数
-            'params'          => [],
+            // 在 Workerman 长驻模式下设置超时，避免空闲后被中间设备静默断开导致查询无限阻塞
+            // ATTR_TIMEOUT: 建立连接超时（秒）
+            // MYSQL_ATTR_READ_DEFAULT_TIMEOUT: 单次读取超时（秒），触发 PDOException 后由 break_reconnect 自动重连
+            'params'          => [
+                \PDO::ATTR_TIMEOUT                    => 5,
+                \PDO::MYSQL_ATTR_READ_DEFAULT_TIMEOUT => 30,
+            ],
             // 数据库编码默认采用utf8mb4
             'charset'         => env('database.charset', 'utf8mb4'),
             // 数据库表前缀
