@@ -36,11 +36,18 @@ return [
             // 数据库连接参数
             // 在 Workerman 长驻模式下设置超时，避免空闲后被中间设备静默断开导致查询无限阻塞
             // ATTR_TIMEOUT: 建立连接超时（秒）
-            // MYSQL_ATTR_READ_DEFAULT_TIMEOUT: 单次读取超时（秒），触发 PDOException 后由 break_reconnect 自动重连
-            'params'          => [
-                \PDO::ATTR_TIMEOUT                    => 5,
-                \PDO::MYSQL_ATTR_READ_DEFAULT_TIMEOUT => 30,
-            ],
+            // MYSQL_ATTR_READ_DEFAULT_TIMEOUT: 单次读取超时（秒），仅在 pdo_mysql + mysqlnd 环境下存在，
+            // 缺失时跳过避免 CLI/未启用 pdo_mysql 的环境加载本配置就 Fatal
+            'params'          => (function () {
+                $params = [];
+                if (defined('PDO::ATTR_TIMEOUT')) {
+                    $params[\PDO::ATTR_TIMEOUT] = 5;
+                }
+                if (defined('PDO::MYSQL_ATTR_READ_DEFAULT_TIMEOUT')) {
+                    $params[\PDO::MYSQL_ATTR_READ_DEFAULT_TIMEOUT] = 30;
+                }
+                return $params;
+            })(),
             // 数据库编码默认采用utf8mb4
             'charset'         => env('database.charset', 'utf8mb4'),
             // 数据库表前缀
